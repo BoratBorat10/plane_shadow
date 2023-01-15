@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
+     integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI="
+     crossorigin=""/>
+     <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
+     integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM="
+     crossorigin=""></script>
+     <style>
+        #map {width: 950px; height: 500px;}
+	
+	</style>
+</head>
+<body>
+    <h1>Plane Shadow Map</h1>
+    <div id="map"></div>
+
+    <script>
+        //cant get this import to work
+        //var SunCalc = require('suncalc');
+
+
+        var map = L.map('map',{
+        center: [32.06792508451304, 34.76924841365686],
+        zoom: 13
+        });
+    
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        var marker = L.marker([32.06792508451304, 34.76924841365686]).addTo(map)
+        
+        // line to airport- cords not exact!
+
+        var plane_start_lat = 32.10580823238354
+        var plane_start_lon = 34.64473533245834
+        var plane_end_lat = 32.011479011288
+        var plane_end_lon = 34.87222821255306
+        var planehight = 300
+
+        var planetrack = [[plane_start_lat, plane_start_lon],[plane_end_lat,plane_end_lon]]
+        L.polyline(planetrack,{color:'red', opacity:1}).addTo(map);
+
+        var sunalt = 34.90
+        var sunang = 164.11
+        // there is a need to conver the alt from degrees to radians for the tan operation
+        //shadow lencth clculation = hight/tan(sun_alltitude)
+        var sunaltradians = (sunalt * (Math.PI/180))
+        var shadowlen = (planehight / Math.tan(sunaltradians))
+        console.log("shadow len", shadowlen)  
+
+        //1 degree = aprox 111000m. amout of degree= x/111000. the more exact would be to do it with Haversine 
+
+        //take the shadow len in meters and deivide by 111000 to find how many degrees to add
+        var degreeadd = shadowlen / 111000
+        console.log("dgree add", degreeadd)
+
+        var shadow_start_lat = (plane_start_lat + degreeadd)
+        var shadow_start_lon = (plane_start_lon)
+        var shadow_end_lat = (plane_end_lat + degreeadd)
+        var shadow_end_lon = (plane_end_lon)
+
+        var shadowtrack = [[shadow_start_lat, shadow_start_lon],[shadow_end_lat,shadow_end_lon]]
+        L.polyline(shadowtrack,{color:'black', opacity:0.5, stroke:true}).addTo(map);
+
+        
+
+        //shaodw test- alt needs to be in radians
+        var buildhight = 16.8
+        var alt = 37
+        var altradians = (alt * (Math.PI/180))
+        console.log (altradians)
+        var calc = (buildhight / Math.tan(altradians))
+        console.log("shadow test calc:", calc)
+        
+        
+    </script>
+    
+</body>
+</html>
