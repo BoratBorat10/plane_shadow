@@ -1,5 +1,5 @@
 import LatLon, { Dms } from 'https://cdn.jsdelivr.net/npm/geodesy@2/latlon-spherical.js';
-import {getPosition} from 'https://www.unpkg.com/suncalc@1.8.0/suncalc.js' 
+//import {getPosition} from 'https://www.unpkg.com/suncalc@1.8.0/suncalc.js' 
 
 
 
