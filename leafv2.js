@@ -1,6 +1,4 @@
 import LatLon, { Dms } from 'https://cdn.jsdelivr.net/npm/geodesy@2/latlon-spherical.js';
-import SunCalc from './node_modules/suncalc.js'
-
 
 var map = L.map('map',{
     center: [32.03993,34.82497],
@@ -55,6 +53,16 @@ var shadowtrack = [[shadow_start.lat, shadow_start.lon],[plane_end_lat,plane_end
 
 
 
+//import SunCalc
+var date = new Date("2014 4 12 12:00")
+var suntest = SunCalc.getPosition(date,32.046108,34.7817992)
+console.log(date)
+console.log(suntest)
+console.log(
+    
+    "azi:", ((suntest.azimuth * (180.0/Math.PI)) +180),
+    "alt:", (suntest.altitude * 180.0/Math.PI)
+)
 
 
 //function that takes point, hight, sun 
