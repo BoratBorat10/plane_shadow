@@ -1,5 +1,5 @@
 import LatLon, { Dms } from 'https://cdn.jsdelivr.net/npm/geodesy@2/latlon-spherical.js';
-var SunCalc = require('suncalc');
+import SunCalc from './node_modules/suncalc.js'
 
 
 var map = L.map('map',{
