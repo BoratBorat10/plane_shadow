@@ -1,4 +1,5 @@
 import LatLon, { Dms } from 'https://cdn.jsdelivr.net/npm/geodesy@2/latlon-spherical.js';
+import noUiSlider from './nouislider/dist/nouislider.mjs'
 
 var map = L.map('map',{
     center: [32.03993,34.82497],
@@ -10,6 +11,19 @@ attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStree
 }).addTo(map);
 
 
+//slider
+var rangeSlider = document.getElementById('slider');
+
+noUiSlider.create(rangeSlider, {
+    start: [180],
+    range: {
+        'min': [0],
+        'max': [360]
+    }
+});
+var sliderpos = slider.noUiSlider.get()
+console.log(sliderpos)
+
 //plane vars
 var plane_start_lat = 32.069344
 var plane_start_lon = 34.760834
@@ -17,10 +31,15 @@ var plane_end_lat = 32.0070064
 var plane_end_lon = 34.8806463
 var planehight = 647
 
+//import SunCalc
+var date = new Date()
+var sunnow = SunCalc.getPosition(date,32.046108,34.7817992)
+var sunnowazi =  ((sunnow.azimuth * (180.0/Math.PI)) +180) //0 is south so 180 needs to be added- took me hours to get this
+var sunnowalt =  (sunnow.altitude * 180.0/Math.PI)
 
 //sun vars
-var sunalt = 36
-var sunang = 180
+var sunalt = sunnowalt
+var sunang = sunnowazi
 
 var sunaltradians = (sunalt * (Math.PI/180))
 
@@ -53,20 +72,22 @@ var shadowtrack = [[shadow_start.lat, shadow_start.lon],[plane_end_lat,plane_end
 
 
 
-//import SunCalc
-var date = new Date("2014 4 12 12:00")
-var suntest = SunCalc.getPosition(date,32.046108,34.7817992)
+
 console.log(date)
-console.log(suntest)
+console.log(sunnow)
 console.log(
     
-    "azi:", ((suntest.azimuth * (180.0/Math.PI)) +180),
-    "alt:", (suntest.altitude * 180.0/Math.PI)
+    "azi:", ((sunnow.azimuth * (180.0/Math.PI)) +180), //0 is south so 180 needs to be added- took me hours to get this
+    "alt:", (sunnow.altitude * 180.0/Math.PI)
 )
 
 
 //function that takes point, hight, sun 
 function shadow_point (point){
 
-
 }
+
+
+const para = document.getElementById("info")
+para.textContent = `NOW: Sun Azi: ${sunnowazi}. Sun Alt: ${sunnowalt}. Slider pos: ${sliderpos}`
+
