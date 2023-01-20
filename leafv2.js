@@ -1,5 +1,6 @@
 import LatLon, { Dms } from 'https://cdn.jsdelivr.net/npm/geodesy@2/latlon-spherical.js';
 import noUiSlider from './nouislider/dist/nouislider.mjs'
+import {geotrack} from './geo_track.js'
 
 var map = L.map('map',{
     center: [32.03993,34.82497],
@@ -23,6 +24,9 @@ noUiSlider.create(rangeSlider, {
 });
 var sliderpos = slider.noUiSlider.get()
 console.log(sliderpos)
+
+
+rangeSlider.addEventListener
 
 //plane vars
 var plane_start_lat = 32.069344
@@ -70,10 +74,27 @@ var planetrack = [[plane_start_lat, plane_start_lon],[plane_end_lat,plane_end_lo
 var shadowtrack = [[shadow_start.lat, shadow_start.lon],[plane_end_lat,plane_end_lon]]
     L.polyline(shadowtrack,{color:'black', opacity:0.5, stroke:true}).addTo(map);
 
+//top info date and sun location
+const para = document.getElementById("info")
+para.textContent = `NOW: ${date} Sun Azi: ${sunnowazi}. Sun Alt: ${sunnowalt}. Slider pos: ${sliderpos}`
 
 
+//plane markers
+    var geojsonMarkerOptions = {
+        radius: 4,
+        fillColor: "#ff7800",
+        color: "#000",
+        weight: 1,
+        opacity: 1,
+        fillOpacity: 0.8
+    };    
+L.geoJSON(geotrack, {pointToLayer: function (feature, latlng) {
+    return L.circleMarker(latlng, geojsonMarkerOptions);
+}}
+).addTo(map);
 
-console.log(date)
+
+console.log("geo test:", geotrack[1].properties.lat,geotrack[1].properties.lon)
 console.log(sunnow)
 console.log(
     
@@ -82,12 +103,32 @@ console.log(
 )
 
 
+
 //function that takes point, hight, sun 
-function shadow_point (point){
+function shadow_point (geotrack, sunnow,){
+
+    for (var i in geotrack){
+        var shadowlatlon = L.latLng({lat:geotrack[i].properties.lon, lng: geotrack[i].properties.lat});
+        
+        var shadow_len = geotrack[i].properties.ele/ Math.tan(sunnow.azimuth)
+        
+        const shadow_pos = new LatLon(geotrack[i].properties.lon, geotrack[i].properties.lat).destinationPoint(shadow_len,(sunnow.azimuth))
+        
+        L.marker(shadow_pos).addTo(map);
+        console.log(shadow_pos)
+    
+
+
+   
+   
+   
+   //return console.log("function",geotrack[44].properties.lat)
+}
 
 }
 
 
-const para = document.getElementById("info")
-para.textContent = `NOW: Sun Azi: ${sunnowazi}. Sun Alt: ${sunnowalt}. Slider pos: ${sliderpos}`
+shadow_point(geotrack,sunnow)
+
+//L.marker([geotrack[44].properties.lat,geotrack[1].properties.lon]).addTo(map)
 
