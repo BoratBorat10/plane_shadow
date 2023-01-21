@@ -57,22 +57,16 @@ var shadowang = (sunang-180)
 //
 const shadow_start = new LatLon(plane_start_lat,plane_start_lon).destinationPoint(shadowlen,shadowang)
 
-console.log(shadow_start.lon)//this is the method!
-
-
-
-
-
-
+console.log("test", geotrack[6].properties.lon)//this is the method!
 
 
 // the plane flight track in red
-var planetrack = [[plane_start_lat, plane_start_lon],[plane_end_lat,plane_end_lon]]
+var planetrack = [[geotrack[8].properties.lon,geotrack[8].properties.lat],[geotrack[32].properties.lon,geotrack[32].properties.lat]]
         L.polyline(planetrack,{color:'red', opacity:1}).addTo(map);
 
 // the shadow track in black
-var shadowtrack = [[shadow_start.lat, shadow_start.lon],[plane_end_lat,plane_end_lon]]
-    L.polyline(shadowtrack,{color:'black', opacity:0.5, stroke:true}).addTo(map);
+//var shadowtrack = [[shadow_start.lat, shadow_start.lon],[plane_end_lat,plane_end_lon]]
+    //L.polyline(shadowtrack,{color:'black', opacity:0.5, stroke:true}).addTo(map);
 
 //top info date and sun location
 const para = document.getElementById("info")
@@ -112,23 +106,25 @@ function shadow_point (geotrack, sunnow,){
         
         var shadow_len = geotrack[i].properties.ele/ Math.tan(sunnow.azimuth)
         
-        const shadow_pos = new LatLon(geotrack[i].properties.lon, geotrack[i].properties.lat).destinationPoint(shadow_len,(sunnow.azimuth))
+        const shadow_pos = new LatLon(geotrack[i].properties.lon, geotrack[i].properties.lat).destinationPoint(shadow_len,(sunnow.azimuth)-180)
         
         L.marker(shadow_pos).addTo(map);
         console.log(shadow_pos)
     
-
-
+    
+        //draw shadow line
+        //var planetrack = [[geotrack[i].properties.lon,geotrack[i].properties.lat],[geotrack[-1].properties.lon,geotrack[6].properties.lat]]
+        //L.polyline(planetrack,{color:'black', opacity:1}).addTo(map);}
    
    
    
    //return console.log("function",geotrack[44].properties.lat)
-}
-
-}
 
 
-shadow_point(geotrack,sunnow)
+}}
+
+
+shadow_point(geotrack,sunnow);
 
 //L.marker([geotrack[44].properties.lat,geotrack[1].properties.lon]).addTo(map)
 
