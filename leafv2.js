@@ -1,6 +1,6 @@
 import LatLon, { Dms } from 'https://cdn.jsdelivr.net/npm/geodesy@2/latlon-spherical.js';
-import noUiSlider from '/nouislider/dist/nouislider.js'
-import {geotrack} from '/geo_track.js'
+import noUiSlider from './nouislider/dist/nouislider.js'
+import {geotrack} from './geo_track.js'
 
 var map = L.map('map',{
     center: [32.03993,34.82497],
