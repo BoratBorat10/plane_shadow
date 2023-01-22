@@ -72,7 +72,8 @@ var planetrack = [[geotrack[8].properties.lon,geotrack[8].properties.lat],[geotr
 
 //top info date and sun location
 const para = document.getElementById("info")
-para.textContent = `NOW: ${date} Sun Azi: ${sunnowazi}. Sun Alt: ${sunnowalt}. Slider pos: ${sliderpos}`
+para.textContent = `NOW: ${date} Sun Azi: ${sunnowazi}. Sun Alt: ${sunnowalt}.`
+//para.textContent = `NOW: ${date} Sun Azi: ${sunnowazi}. Sun Alt: ${sunnowalt}. Slider pos: ${sliderpos}`removed the info with the slider info
 
 
 //plane markers
