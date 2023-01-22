@@ -109,7 +109,7 @@ function shadow_point (geotrack, sunnow,){
         
         var shadow_len = geotrack[i].properties.ele/ Math.tan(sunnow.azimuth)
         
-        const shadow_pos = new LatLon(geotrack[i].properties.lon, geotrack[i].properties.lat).destinationPoint(shadow_len,(sunnow.azimuth)-180)
+        const shadow_pos = new LatLon(geotrack[i].properties.lon, geotrack[i].properties.lat).destinationPoint(shadow_len,(sunnow.azimuth))
         
         L.marker(shadow_pos).addTo(map);
         console.log(shadow_pos)
