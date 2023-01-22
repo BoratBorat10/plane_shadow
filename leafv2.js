@@ -27,6 +27,7 @@ console.log(sliderpos)
 
 
 rangeSlider.addEventListener
+*/
 
 //plane vars
 var plane_start_lat = 32.069344
@@ -34,7 +35,7 @@ var plane_start_lon = 34.760834
 var plane_end_lat = 32.0070064
 var plane_end_lon = 34.8806463
 var planehight = 647
-*/
+
 
 //import SunCalc
 var date = new Date()
