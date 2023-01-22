@@ -23,6 +23,23 @@ slider.oninput = function() {
 
 
 
+slider.addEventListener('mousedown', mouse);
+
+function mouse (){
+    
+    L.marker([32.065,slider.value]).addTo(map)
+}
+
+
+/*
+
+setInterval(function(){
+    L.marker([32.06921428839085, slider.value]).addTo(map)},
+    10000
+
+)
+
+*/
 
 
 //slider
@@ -125,7 +142,7 @@ function shadow_point (geotrack, sunnow,){
         const shadow_pos = new LatLon(geotrack[i].properties.lon, geotrack[i].properties.lat).destinationPoint(shadow_len,(sunnow.azimuth))
         
         L.marker(shadow_pos).addTo(map);
-        console.log(shadow_pos)
+        //console.log(shadow_pos)
     
     
         //draw shadow line
