@@ -1,5 +1,5 @@
 import LatLon, { Dms } from 'https://cdn.jsdelivr.net/npm/geodesy@2/latlon-spherical.js';
-import * as noUiSlider from 'https://cdn.bootcss.com/noUiSlider/15.6.1/nouislider.js'
+//import * as noUiSlider from 'https://cdn.bootcss.com/noUiSlider/15.6.1/nouislider.js' //slider
 import {geotrack} from './node_modules/geo_track.js'
 
 var map = L.map('map',{
@@ -13,8 +13,8 @@ attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStree
 
 
 //slider
-var rangeSlider = document.getElementById('slider');
-
+//var rangeSlider = document.getElementById('slider');
+/*
 noUiSlider.create(rangeSlider, {
     start: [180],
     range: {
@@ -34,6 +34,7 @@ var plane_start_lon = 34.760834
 var plane_end_lat = 32.0070064
 var plane_end_lon = 34.8806463
 var planehight = 647
+*/
 
 //import SunCalc
 var date = new Date()
