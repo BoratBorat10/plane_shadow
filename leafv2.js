@@ -22,13 +22,21 @@ slider.oninput = function() {
 } 
 
 
+var markerpos = L.marker([32.07,34.78]).addTo(map)
 
-slider.addEventListener('mousedown', mouse);
+document.getElementById('slider').addEventListener('input', function (){
+    var value = this.value
+    var newlng = value
+    markerpos.setLatLng(L.latLng(32.07,newlng))
 
-function mouse (){
-    
-    L.marker([32.065,slider.value]).addTo(map)
-}
+
+
+});
+
+
+
+
+
 
 
 /*
