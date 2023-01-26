@@ -1,5 +1,4 @@
 import LatLon, { Dms } from 'https://cdn.jsdelivr.net/npm/geodesy@2/latlon-spherical.js';
-//import * as noUiSlider from 'https://cdn.bootcss.com/noUiSlider/15.6.1/nouislider.js' //slider
 import {geotrack} from './node_modules/geo_track.js'
 
 var map = L.map('map',{
@@ -21,51 +20,19 @@ slider.oninput = function() {
   output.innerHTML = this.value;
 } 
 
-
+//move test marker by slider
 var markerpos = L.marker([32.07,34.78]).addTo(map)
 
 document.getElementById('slider').addEventListener('input', function (){
     var value = this.value
     var newlng = value
-    markerpos.setLatLng(L.latLng(32.07,newlng))
+    markerpos.setLatLng(L.latLng(32.07,34.8))
 
 
+    return value
 
 });
 
-
-
-
-
-
-
-/*
-
-setInterval(function(){
-    L.marker([32.06921428839085, slider.value]).addTo(map)},
-    10000
-
-)
-
-*/
-
-
-//slider
-//var rangeSlider = document.getElementById('slider');
-/*
-noUiSlider.create(rangeSlider, {
-    start: [180],
-    range: {
-        'min': [0],
-        'max': [360]
-    }
-});
-var sliderpos = slider.noUiSlider.get()
-console.log(sliderpos)
-
-
-rangeSlider.addEventListener
-*/
 
 //plane vars
 var plane_start_lat = 32.069344
@@ -76,7 +43,8 @@ var planehight = 647
 
 
 //import SunCalc
-var date = new Date()
+var date = new Date(2023,0,26,13)
+var newDate = date.setHours(slider.value)
 var sunnow = SunCalc.getPosition(date,32.046108,34.7817992)
 var sunnowazi =  ((sunnow.azimuth * (180.0/Math.PI)) +180) //0 is south so 180 needs to be added- took me hours to get this
 var sunnowalt =  (sunnow.altitude * 180.0/Math.PI)
@@ -145,21 +113,14 @@ function shadow_point (geotrack, sunnow,){
     for (var i in geotrack){
         var shadowlatlon = L.latLng({lat:geotrack[i].properties.lon, lng: geotrack[i].properties.lat});
         
-        var shadow_len = geotrack[i].properties.ele/ Math.tan(sunnow.azimuth)
+        var shadow_len = geotrack[i].properties.ele/ Math.tan(sunnow.altitude)
         
         const shadow_pos = new LatLon(geotrack[i].properties.lon, geotrack[i].properties.lat).destinationPoint(shadow_len,(sunnow.azimuth))
         
         L.marker(shadow_pos).addTo(map);
-        //console.log(shadow_pos)
-    
-    
-        //draw shadow line
-        //var planetrack = [[geotrack[i].properties.lon,geotrack[i].properties.lat],[geotrack[-1].properties.lon,geotrack[6].properties.lat]]
-        //L.polyline(planetrack,{color:'black', opacity:1}).addTo(map);}
-   
-   
-   
-   //return console.log("function",geotrack[44].properties.lat)
+
+        console.log("shadow point ran")
+
 
 
 }}
