@@ -15,41 +15,14 @@ var slider = document.getElementById("slider");
 var output = document.getElementById("demo");
 output.innerHTML = slider.value; // Display the default slider value
 
-// Update the current slider value (each time you drag the slider handle). updates info bar
-slider.oninput = function() {
-  output.innerHTML = date;
-  const para = document.getElementById("info")
-    para.textContent = `NOW: ${date} Sun Azi: ${sunnowazi}. Sun Alt: ${sunnowalt}.`
-    console.log("ran")
-} 
-
-//move test marker by slider
-var markerpos = L.marker([32.07,34.78]).addTo(map)
-/*
-document.getElementById('slider').addEventListener('input', function (){
-    var value = this.value
-    var newlng = value
-    markerpos.setLatLng(L.latLng(32.07,34.8))
-
-
-    return value
-
-});
-
-*/
 
 //chnages the date with the slider
 document.getElementById('slider').addEventListener('input', function (){
     var value = this.value
     date = new Date()
     date.setHours(this.value)
-    
-
-
-
-
-
 });
+
 
 //plane vars
 var plane_start_lat = 32.069344
@@ -60,7 +33,7 @@ var planehight = 647
 
 
 //import SunCalc
-var date = new Date()
+var date = new Date(2023,0,29,13,0)
 var newDate = date.setHours(5)
 console.log("dates:",date, Date(newDate))
 var sunnow = SunCalc.getPosition(date,32.046108,34.7817992)
@@ -94,19 +67,8 @@ var shadowlen = (planehight / Math.tan(sunaltradians))
 var shadowang = (sunang-180)
 
 
-//
-const shadow_start = new LatLon(plane_start_lat,plane_start_lon).destinationPoint(shadowlen,shadowang)
-
-console.log("test", geotrack[6].properties.lon)//this is the method!
 
 
-// the plane flight track in red
-var planetrack = [[geotrack[8].properties.lon,geotrack[8].properties.lat],[geotrack[32].properties.lon,geotrack[32].properties.lat]]
-        L.polyline(planetrack,{color:'red', opacity:1}).addTo(map);
-
-// the shadow track in black
-//var shadowtrack = [[shadow_start.lat, shadow_start.lon],[plane_end_lat,plane_end_lon]]
-    //L.polyline(shadowtrack,{color:'black', opacity:0.5, stroke:true}).addTo(map);
 
 //top info date and sun location
 const para = document.getElementById("info")
@@ -128,40 +90,77 @@ L.geoJSON(geotrack, {pointToLayer: function (feature, latlng) {
 ).addTo(map);
 
 
-console.log("geo test:", geotrack[1].properties.lat,geotrack[1].properties.lon)
-console.log(sunnow)
-console.log(
-    
-    "azi:", ((sunnow.azimuth * (180.0/Math.PI)) +180), //0 is south so 180 needs to be added- took me hours to get this
-    "alt:", (sunnow.altitude * 180.0/Math.PI)
-)
 
-
-
+const plane_ar = []
 //function that takes point, hight, sun 
-function shadow_point (geotrack, sunnow,){
+function shadow_point (geotrack, sunnow,array){
 
     for (var i in geotrack){
+        
+        
         var shadowlatlon = L.latLng({lat:geotrack[i].properties.lon, lng: geotrack[i].properties.lat});
         
         var shadow_len = geotrack[i].properties.ele/ Math.tan(sunnow.altitude)
         
         const shadow_pos = new LatLon(geotrack[i].properties.lon, geotrack[i].properties.lat).destinationPoint(shadow_len,(sunnow.azimuth))
         
-        L.marker(shadow_pos).addTo(map);
-
-        console.log("shadow point ran")
-
-
-
+        array.push({'lng': geotrack[i].properties.lat,'lat': geotrack[i].properties.lon, 'ele': geotrack[i].properties.ele})
+        
+        
+        
 }}
 
 
-shadow_point(geotrack,sunnow);
-
-//document.getElementById('slider').addEventListener('input', shadow_point(geotrack, date)
+shadow_point(geotrack,sunnow,plane_ar);
 
 
+console.log(plane_ar)
+console.log(plane_ar[1].lon)
+
+//create a line fomr the array
+var planeline = L.polyline(plane_ar,{color:'red'}).addTo(map);
+console.log(planeline)
+
+/*
+function shadow_point_2 (array){
+    shadow_len = array[i].ele / Math.tan(sunnow.altitude)
+
+
+
+
+
+
+}
+
+*/
+
+
+//const shadow_ar = plane_ar.map(shadow_point_2)
+
+
+
+// Update the current slider value (each time you drag the slider handle). updates info bar
+slider.oninput = function() {
+    output.innerHTML = date;
+  
+    var slidersun = SunCalc.getPosition(date,32.046108,34.7817992)
+    
+    shadow_point(geotrack,slidersun)
+  
+  
+    const para = document.getElementById("info")
+      para.textContent = `NOW: ${date} Sun Azi: ${slidersun.azimuth}. Sun Alt: ${slidersun.altitude}.`
+      console.log("ran")
+  } 
+
+
+//now button resets date (doesnt work)
+document.getElementById('nowbutton').onclick =function(date){
+    date = Date()
+    console.log("now pressed")
+}
+
+var fx = new L.PosAnimation();
 
 //L.marker([geotrack[44].properties.lat,geotrack[1].properties.lon]).addTo(map)
 
