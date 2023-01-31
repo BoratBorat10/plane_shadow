@@ -101,8 +101,9 @@ console.log(shadow_ar[0])
 
 
 shadow_marker.setLatLng([endpoint._lat, endpoint._lon])
-
-var shadowline = L.polyline(shadow_ar,{color:'black'}).addTo(map)
+var shadowline = L.polyline(shadow_ar,{color:'black'})
+shadowline.remove(map);
+shadowline.addTo(map)
 console.log(plane_ar)
 
 
