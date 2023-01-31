@@ -108,31 +108,37 @@ function shadow_point (geotrack, sunnow,array){
         
         
         
-}}
+}
+//create a line fomr the array
+var planeline = L.polyline(plane_ar,{color:'red'}).addTo(map);
+}
 
 
 shadow_point(geotrack,sunnow,plane_ar);
 
 
 console.log(plane_ar)
-console.log(plane_ar[1].lon)
-
-//create a line fomr the array
-var planeline = L.polyline(plane_ar,{color:'red'}).addTo(map);
-console.log(planeline)
-
-/*
-function shadow_point_2 (array){
-    shadow_len = array[i].ele / Math.tan(sunnow.altitude)
+console.log(plane_ar[1].lng)
 
 
+const shadow_ar = []
 
-
-
+function shadow_point_2 (array,shadow_ar){
+    
+    
+    
+    for (var i in array){
+       var shadow_len = array[i].ele / Math.tan(sunnow.altitude);
+        var shadow_pos = new LatLon(array[i].lng, array[i].lat).destinationPoint(shadow_len,(sunnow.azimuth));
+        //console.log(array[1])
+        shadow_ar.push({'lng': array[i].lng,'lat': array[i].lat, 'shadow_len': shadow_len})
+    }
+console.log (shadow_ar)
+ 
 
 }
 
-*/
+
 
 
 //const shadow_ar = plane_ar.map(shadow_point_2)
@@ -145,8 +151,11 @@ slider.oninput = function() {
   
     var slidersun = SunCalc.getPosition(date,32.046108,34.7817992)
     
-    shadow_point(geotrack,slidersun)
-  
+    shadow_point_2(plane_ar,shadow_ar)
+    
+    //create a line fomr the array
+    var shadowline = L.polyline(shadow_ar,{color:'black'}).addTo(map);
+
   
     const para = document.getElementById("info")
       para.textContent = `NOW: ${date} Sun Azi: ${slidersun.azimuth}. Sun Alt: ${slidersun.altitude}.`
@@ -160,7 +169,7 @@ document.getElementById('nowbutton').onclick =function(date){
     console.log("now pressed")
 }
 
-var fx = new L.PosAnimation();
+
 
 //L.marker([geotrack[44].properties.lat,geotrack[1].properties.lon]).addTo(map)
 
