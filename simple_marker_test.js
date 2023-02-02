@@ -26,16 +26,17 @@ const plane_ar = []
 for (var i in geotrack){
     plane_ar.push({'lat': geotrack[i].properties.lon, 'lng': geotrack[i].properties.lat, 'ele': geotrack[i].properties.ele})   
 }
+var active_polyline = L.featureGroup().addTo(map)
+
 //create a line fomr the array
 var planeline = L.polyline(plane_ar,{color:'red'}).addTo(map)
 console.log(plane_ar)
 
 var shadow_ar = [] //create empty array for shadows
 
+;
 
 
-//just shaodw marker to be set.latlon later
-var shadow_marker = L.marker([32.07,34.78]).addTo(map)
 
 var date = new Date() //takes curent date
 
@@ -72,11 +73,9 @@ for (var i in start_array){
 
 }
 
-
-console.log(plane_ar[3].ele)
-
-var shadowline = L.polyline(shadow_ar,{color:'black'}).addTo(map)
-
+shadowcalc(plane_ar,shadow_ar)
+var first_line = L.polyline(shadow_ar,{color:'orange'}).addTo(map)
+var  new_ar = []
 //when the slider changes:
 document.getElementById('slider').addEventListener('input', function (){
 var sunpos= SunCalc.getPosition(date,32.07,34.78)
@@ -85,33 +84,33 @@ var sunazi =  ((sunpos.azimuth * (180.0/Math.PI))) //0 is south so 180 needs to 
 var sunalt =  (sunpos.altitude * 180.0/Math.PI)
 
 var shadowlen = (ele / Math.tan(sunpos.altitude))
-
+var new_ar = []
 //var startpoint = new LatLon(32.07,34.78)
-var endpoint = new LatLon(32.067627,34.764091).destinationPoint(shadowlen,(sunazi+360))
+//var endpoint = new LatLon(32.067627,34.764091).destinationPoint(shadowlen,(sunazi+360))
+//shadow_marker.setLatLng([endpoint._lat, endpoint._lon])
+active_polyline.clearLayers();
 
+shadowcalc(plane_ar,new_ar)
+var shadowline = L.polyline(new_ar,{color:'black'})
 
-shadowcalc(plane_ar,shadow_ar)
-
-console.log(shadow_ar[0])
-//console.log(shadow_ar)
-
-
-
+shadowline.addTo(active_polyline);
 
 
 
-shadow_marker.setLatLng([endpoint._lat, endpoint._lon])
-var shadowline = L.polyline(shadow_ar,{color:'black'})
-shadowline.remove(map);
-shadowline.addTo(map)
-console.log(plane_ar)
+console.log(shadow_ar)
 
-
+//update the top info row
 const para = document.getElementById("info")
     para.textContent = `Time: ${date}, alt: ${sunalt}, azi: ${sunazi+180}, shadow len: ${shadowlen}`
 
 
-
-
+    
+   
 });
 
+//now button resets date (doesnt work)
+document.getElementById('nowbutton').onclick =function(date){
+    date = Date()
+    console.log("now pressed")
+    active_polyline.clearLayers();
+}
