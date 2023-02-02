@@ -140,7 +140,6 @@ console.log (shadow_ar)
 
 
 
-
 //const shadow_ar = plane_ar.map(shadow_point_2)
 
 
