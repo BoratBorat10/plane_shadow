@@ -22,11 +22,22 @@
 	</style>
 </head>
 <body>
-    <div id = "info"></div>
+    <p>Info Row:  <span id="date"></span><span id="sunpos"></span></p>
+    
+    <div id="time-slider-container">
+        <div id="time-scale-container"><table id="time-scale"><tbody><tr><td>00<span>:00</span></td><td>01<span>:00</span></td><td>02<span>:00</span></td><td>03<span>:00</span></td><td>04<span>:00</span></td><td>05<span>:00</span></td><td>06<span>:00</span></td><td>07<span>:00</span></td><td>08<span>:00</span></td><td>09<span>:00</span></td><td>10<span>:00</span></td><td>11<span>:00</span></td><td>12<span>:00</span></td><td>13<span>:00</span></td><td>14<span>:00</span></td><td>15<span>:00</span></td><td>16<span>:00</span></td><td>17<span>:00</span></td><td>18<span>:00</span></td><td>19<span>:00</span></td><td>20<span>:00</span></td><td>21<span>:00</span></td><td>22<span>:00</span></td><td>23<span>:00</span></td></tr></tbody></table></div>
+        <div id="time-slider-2" class="ui-slider ui-corner-all ui-slider-horizontal ui-widget ui-widget-content">
+            <div id="time-scale-twilight" style="left: 25.5733%; right: 26.3377%;"></div>
+            <div id="time-scale-twilight-2" style="display: none;"></div>
+            <div id="time-scale-sunlight" style="left: 27.3106%; right: 28.0751%;"></div>
+            <div id="time-scale-sunlight-2" style="display: none;"></div>
+        <span tabindex="0" class="ui-slider-handle ui-corner-all ui-state-default" style="left: 84.1557%;"></span></div>
+    </div>
+
     <div>
   	<input type="range" id="slider" name="slider" 
-         min="0" max="23"  step="1">
-  	<p>Value: <span id="demo"></span></p>
+         min="0" max="1440" value="720" step="1">
+  	<p>Value:  <span id="demo"></span></p>
 	</div>
     <button id="nowbutton" type="button">Now</button>
     <div id="map"></div>

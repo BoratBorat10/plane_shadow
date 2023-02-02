@@ -17,7 +17,6 @@ output.innerHTML = slider.value; // Display the default slider value
  
 
 //marker testing
-var marker = L.marker([32.067627,34.764091]).addTo(map)
 const ele =670
 
 
@@ -28,24 +27,38 @@ for (var i in geotrack){
 }
 var active_polyline = L.featureGroup().addTo(map)
 
-//create a line fomr the array
+//red plane line
 var planeline = L.polyline(plane_ar,{color:'red'}).addTo(map)
-console.log(plane_ar)
 
-var shadow_ar = [] //create empty array for shadows
 
-;
+
+
+
+
+
+var shadow_ar = [] //create empty array for shadows;
 
 
 
 var date = new Date() //takes curent date
 
+var sunpos= SunCalc.getPosition(date,plane_ar[1].lat,plane_ar[1].lng)
+var sunalt =  (sunpos.altitude * 180.0/Math.PI)
+
+console.log(sunalt)
+
+
 //chnages the date with the slider
 document.getElementById('slider').addEventListener('input', function (){
+    
+    var hours = Math.floor(slider.value / 60)
+    var minutes = slider.value % 60
+    
     var value = this.value
     
-    date.setHours(this.value)
+    date.setHours(hours,minutes)
     // the slider supplies 0-23 number and this corresoponds to a hour of the day that is re set
+    console.log(minutes)
 });
 
 //chnages the value diaplay under the slider
@@ -74,8 +87,15 @@ for (var i in start_array){
 }
 
 shadowcalc(plane_ar,shadow_ar)
-var first_line = L.polyline(shadow_ar,{color:'orange'}).addTo(map)
+
+
+//create a line fomr the array
+if (sunalt > 10){
+    var first_line = L.polyline(shadow_ar,{color:'orange'}).addTo(map)
+    };
+
 var  new_ar = []
+
 //when the slider changes:
 document.getElementById('slider').addEventListener('input', function (){
 var sunpos= SunCalc.getPosition(date,32.07,34.78)
@@ -93,17 +113,21 @@ active_polyline.clearLayers();
 shadowcalc(plane_ar,new_ar)
 var shadowline = L.polyline(new_ar,{color:'black'})
 
-shadowline.addTo(active_polyline);
+if (sunalt > 0){
+shadowline.addTo(active_polyline)
+console.log('sun alt positive')
+};
 
 
 
-console.log(shadow_ar)
+
 
 //update the top info row
-const para = document.getElementById("info")
-    para.textContent = `Time: ${date}, alt: ${sunalt}, azi: ${sunazi+180}, shadow len: ${shadowlen}`
 
-
+    
+    document.getElementById('date').textContent= date
+    document.getElementById('sunpos').textContent= `alt: ${sunalt}, azi: ${sunazi+180}, shadow len: ${shadowlen}`
+console.log('slidr:',slider.getAttribute('max'))
     
    
 });
@@ -111,6 +135,9 @@ const para = document.getElementById("info")
 //now button resets date (doesnt work)
 document.getElementById('nowbutton').onclick =function(date){
     date = Date()
-    console.log("now pressed")
+    console.log("now pressed",date)
     active_polyline.clearLayers();
+    document.getElementById('date').textContent= date
+
+    
 }
