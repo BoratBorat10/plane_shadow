@@ -25,10 +25,18 @@ const plane_ar = []
 for (var i in geotrack){
     plane_ar.push({'lat': geotrack[i].properties.lon, 'lng': geotrack[i].properties.lat, 'ele': geotrack[i].properties.ele})   
 }
-var active_polyline = L.featureGroup().addTo(map)
+
+//create layers
+var active_polyline = L.featureGroup().addTo(map)//create layer
+var layerControl = L.control.layers(null, pointline).addTo(map);
+
+
+
+var pointline = L.layerGroup()// layer for the yellow connecting lines
+layerControl.addOverlay(pointline, "Point Connect");
 
 //red plane line
-var planeline = L.polyline(plane_ar,{color:'red'}).addTo(map)
+var planeline = L.polyline(plane_ar,{color:'red', opacity:'2'}).addTo(map)
 
 console.log('first plane_ar', plane_ar)
 
@@ -62,7 +70,10 @@ document.getElementById('slider').addEventListener('input', function (){
 
 //chnages the value diaplay under the slider
 slider.oninput = function() {
-    output.innerHTML = this.value;} 
+    output.innerHTML = this.value;
+    pointline.clearLayers()//clears the yellow connecting line- just stuck in here and is somehow works to clear them beofre the next one is drawn
+
+} 
 
 
 //function that takes a point and reterns its shadow point
@@ -150,14 +161,24 @@ shadowline.addTo(active_polyline)
 };
 
 
-
 cresent.push({'lat': plane_ar[20].lat, 'lng':plane_ar[20].lng})
 
 //console.log('creshen:',cresent)
 L.polyline(cresent,{color:'blue'}).addTo(map)
 
+//draws the yellow connecting lines
+var pointpair = []
+for (var i in plane_ar){
+   
 
+    var pointpair = [[plane_ar[i].lat,plane_ar[i].lng],[new_ar[i].lat,new_ar[i].lng]]
+    L.polyline(pointpair,{color:'yellow'}).addTo(pointline);
+   console.log('yellow line log')
+   
 
+}
+
+    
 var testmark1 = L.marker([plane_ar[20].lat,plane_ar[20].lng]).addTo(map)
 
 var testmark2 = L.marker([new_ar[20].lat,new_ar[20].lng]).addTo(map)
@@ -181,6 +202,7 @@ document.getElementById('nowbutton').onclick =function(date){
     date = Date()
     console.log("now pressed",date)
     document.getElementById('date').textContent= date
+    pointline.clearLayers()
 
     
 }
