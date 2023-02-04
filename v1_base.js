@@ -53,7 +53,7 @@ var shadow_ar = [] //create empty array for shadows;
 
 
 const date = new Date() //takes curent date
-setInterval((function(){console.log(`date: ${date}. Slider Date: ${sliderdate}`)}),1000)
+//setInterval((function(){console.log(`date: ${date}. Slider Date: ${sliderdate}`)}),1000)
 
 var  sliderdate = new Date(date)
 
@@ -115,8 +115,6 @@ function nowlinemove(){
         nowlinemove.addTo(nowline)
         };
     
-    console.log(nowpos.altitude)
-
     }
 
 
