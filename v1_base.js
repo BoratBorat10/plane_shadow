@@ -25,12 +25,24 @@ const plane_ar = []
 for (var i in geotrack){
     plane_ar.push({'lat': geotrack[i].properties.lon, 'lng': geotrack[i].properties.lat, 'ele': geotrack[i].properties.ele})   
 }
-var active_polyline = L.featureGroup().addTo(map)
+
+//create layers
+var active_polyline = L.featureGroup().addTo(map)//create layer
+var layerControl = L.control.layers(null, pointline).addTo(map);
+
+
+// layer for the yellow connecting lines
+var pointline = L.layerGroup()
+layerControl.addOverlay(pointline, "Point Connect");
+
+var nowline = L.layerGroup()
+layerControl.addOverlay(nowline, "Now Line");
+map.addLayer(nowline)
+
 
 //red plane line
-var planeline = L.polyline(plane_ar,{color:'red'}).addTo(map)
+var planeline = L.polyline(plane_ar,{color:'red',}).addTo(map)
 
-console.log('first plane_ar', plane_ar)
 
 
 
@@ -40,7 +52,10 @@ var shadow_ar = [] //create empty array for shadows;
 
 
 
-var date = new Date() //takes curent date
+const date = new Date() //takes curent date
+setInterval((function(){console.log(`date: ${date}. Slider Date: ${sliderdate}`)}),1000)
+
+var  sliderdate = new Date(date)
 
 //var sunpos= SunCalc.getPosition(date,plane_ar[1].lat,plane_ar[1].lng)
 //var sunalt =  (sunpos.altitude * 180.0/Math.PI)
@@ -54,22 +69,24 @@ document.getElementById('slider').addEventListener('input', function (){
     var hours = Math.floor(slider.value / 60)
     var minutes = slider.value % 60
     
-    var value = this.value
     
-    date.setHours(hours,minutes)
+    sliderdate.setHours(hours,minutes)
     // the slider supplies 0-23 number and this corresoponds to a hour of the day that is re set
 });
 
 //chnages the value diaplay under the slider
 slider.oninput = function() {
-    output.innerHTML = this.value;} 
+    output.innerHTML = this.value;
+    pointline.clearLayers()//clears the yellow connecting line- just stuck in here and is somehow works to clear them beofre the next one is drawn
+
+} 
 
 
 //function that takes a point and reterns its shadow point
-function shadowcalc(start_array,end_array){
+function shadowcalc(start_array,end_array,time){
 for (var i in start_array){
 
-    var sunpos= SunCalc.getPosition(date,start_array[i].lat,start_array[i].lng)
+    var sunpos= SunCalc.getPosition(time,start_array[i].lat,start_array[i].lng)
 
     var sunazi =  ((sunpos.azimuth * (180.0/Math.PI))) //0 is south so 180 needs to be added- took me hours to get this
     var sunalt =  (sunpos.altitude * 180.0/Math.PI)
@@ -82,9 +99,25 @@ for (var i in start_array){
 }
 }
 
-var times = SunCalc.getTimes((date),32.07,34.78)
-console.log(times)
-console.log(SunCalc.getPosition(times.sunriseEnd,32.07,34.78))
+
+//the now orange line
+setInterval(nowlinemove,1000)//updates everysecond
+function nowlinemove(){
+    nowline.clearLayers()// clears the layer from the previuos line
+    var nowdate = new Date()
+    var now_ar = [] //creates empty array
+    shadowcalc(plane_ar,now_ar,nowdate)//populates now_ar using the current time param
+    var nowlinemove = L.polyline(now_ar,{color:'orange'})
+    
+    var nowpos= SunCalc.getPosition(nowdate,plane_ar[i].lat,plane_ar[i].lng)
+    
+    if ((nowpos.altitude* 180.0/Math.PI) > 0){
+        nowlinemove.addTo(nowline)
+        };
+    
+    console.log(nowpos.altitude)
+
+    }
 
 
 /*ark function
@@ -131,7 +164,7 @@ var  new_ar = []
 var  cresent = []
 //when the slider changes:
 document.getElementById('slider').addEventListener('input', function (){
-var sunpos= SunCalc.getPosition(date,32.07,34.78)
+var sunpos= SunCalc.getPosition(sliderdate,32.07,34.78)
 
 var sunazi =  ((sunpos.azimuth * (180.0/Math.PI))) //0 is south so 180 needs to be added- took me hours to get this
 var sunalt =  (sunpos.altitude * 180.0/Math.PI)
@@ -142,7 +175,7 @@ var new_ar = []
 //var endpoint = new LatLon(32.067627,34.764091).destinationPoint(shadowlen,(sunazi+360))
 //shadow_marker.setLatLng([endpoint._lat, endpoint._lon])
 active_polyline.clearLayers();
-shadowcalc(plane_ar,new_ar)
+shadowcalc(plane_ar,new_ar,sliderdate)
 var shadowline = L.polyline(new_ar,{color:'black'})
 
 if (sunalt > 0){
@@ -150,27 +183,32 @@ shadowline.addTo(active_polyline)
 };
 
 
-
 cresent.push({'lat': plane_ar[20].lat, 'lng':plane_ar[20].lng})
 
 //console.log('creshen:',cresent)
 L.polyline(cresent,{color:'blue'}).addTo(map)
 
+//draws the yellow connecting lines
+var pointpair = []
+for (var i in plane_ar){
+   
 
+    var pointpair = [[plane_ar[i].lat,plane_ar[i].lng],[new_ar[i].lat,new_ar[i].lng]]
+    L.polyline(pointpair,{color:'yellow'}).addTo(pointline);
+   
 
+}
+
+/*    Markers for testing- diplayes each shadow point for point[20]
 var testmark1 = L.marker([plane_ar[20].lat,plane_ar[20].lng]).addTo(map)
-
 var testmark2 = L.marker([new_ar[20].lat,new_ar[20].lng]).addTo(map)
+*/
 
-var testmark3 = L.marker([new_ar[14].lat,new_ar[14].lng])
-
-console.log("shadowclalc testing:")
-//console.log(new_ar)
 
 //update the top info row
 
     
-    document.getElementById('date').textContent= date
+    document.getElementById('date').textContent= sliderdate
     document.getElementById('sunpos').textContent= `alt: ${sunalt}, azi: ${sunazi+180}, shadow len: ${shadowlen}`
     
    
@@ -178,9 +216,11 @@ console.log("shadowclalc testing:")
 
 //now button resets date (doesnt work)
 document.getElementById('nowbutton').onclick =function(date){
-    date = Date()
+    //date = Date()
     console.log("now pressed",date)
     document.getElementById('date').textContent= date
+    slider.setAttribute('value',slider.value +10 )
+    console.log(slider.max  )
 
     
 }
