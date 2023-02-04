@@ -35,6 +35,10 @@ var layerControl = L.control.layers(null, pointline).addTo(map);
 var pointline = L.layerGroup()
 layerControl.addOverlay(pointline, "Point Connect");
 
+var nowline = L.layerGroup()
+layerControl.addOverlay(nowline, "Now Line");
+map.addLayer(nowline)
+
 
 //red plane line
 var planeline = L.polyline(plane_ar,{color:'red',}).addTo(map)
@@ -97,19 +101,23 @@ for (var i in start_array){
 
 
 //the now orange line
-setInterval(nowline,1000)
-function nowline(){
-    //console.log(date)
+setInterval(nowlinemove,1000)//updates everysecond
+function nowlinemove(){
+    nowline.clearLayers()// clears the layer from the previuos line
+    var nowdate = new Date()
+    var now_ar = [] //creates empty array
+    shadowcalc(plane_ar,now_ar,nowdate)//populates now_ar using the current time param
+    var nowlinemove = L.polyline(now_ar,{color:'orange'})
     
-    var now_ar = []
-    shadowcalc(plane_ar,now_ar,date)
+    var nowpos= SunCalc.getPosition(nowdate,plane_ar[i].lat,plane_ar[i].lng)
+    
+    if ((nowpos.altitude* 180.0/Math.PI) > 0){
+        nowlinemove.addTo(nowline)
+        };
+    
+    console.log(nowpos.altitude)
 
-
-
-    var nowline = L.polyline(now_ar,{color:'orange'}).addTo(map);
-    //console.log(now_date)
-   // console.log('slider',sliderdate)
-}
+    }
 
 
 /*ark function
@@ -211,7 +219,6 @@ document.getElementById('nowbutton').onclick =function(date){
     //date = Date()
     console.log("now pressed",date)
     document.getElementById('date').textContent= date
-    pointline.clearLayers()
     slider.setAttribute('value',slider.value +10 )
     console.log(slider.max  )
 
