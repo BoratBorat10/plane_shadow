@@ -1,6 +1,6 @@
 import LatLon, { Dms } from 'https://cdn.jsdelivr.net/npm/geodesy@2/latlon-spherical.js';
 import {geotrack} from './geo_track.js'
-
+import { airlab } from './airlab.js';
 var map = L.map('map',{
     center: [32.03993,34.82497],
     zoom: 13
@@ -31,13 +31,18 @@ var active_polyline = L.featureGroup().addTo(map)//create layer
 var layerControl = L.control.layers(null, pointline).addTo(map);
 
 
-// layer for the yellow connecting lines
+// layer for the yellow connecting lines. Off by defult
 var pointline = L.layerGroup()
 layerControl.addOverlay(pointline, "Point Connect");
 
 var nowline = L.layerGroup()
 layerControl.addOverlay(nowline, "Now Line");
-map.addLayer(nowline)
+map.addLayer(nowline)// on by defult
+
+//layer for live plane markers
+var liveplane = L.layerGroup()
+layerControl.addOverlay(liveplane, "Live Plane")
+map.addLayer(liveplane)// on by defult
 
 
 //red plane line
@@ -53,7 +58,6 @@ var shadow_ar = [] //create empty array for shadows;
 
 
 const date = new Date() //takes curent date
-setInterval((function(){console.log(`date: ${date}. Slider Date: ${sliderdate}`)}),1000)
 
 var  sliderdate = new Date(date)
 
@@ -115,7 +119,6 @@ function nowlinemove(){
         nowlinemove.addTo(nowline)
         };
     
-    console.log(nowpos.altitude)
 
     }
 
@@ -224,3 +227,35 @@ document.getElementById('nowbutton').onclick =function(date){
 
     
 }
+
+
+//every time fetch api button is pressed- this is to minimize api calls
+document.getElementById('fetchbutton').onclick= function(){
+//remove the [0] when working on the real thing
+console.log(airlab[0])
+console.log([[airlab[0].response[1].lng],[airlab[0].response[1].lng]])
+for (i in airlab[0].response){
+    //if the arrival airport is LLBG and the alt is not 0 (ie. not on the gound)
+    if (airlab[0].response[i].arr_icao ='LLBG' && airlab[0].response[i].alt > 0 ){
+    L.marker([airlab[0].response[i].lat,airlab[0].response[i].lng]).bindPopup(airlab[0].response[i].hex).addTo(liveplane)
+    }
+}
+}
+
+/*    
+    //fetch flight data section
+fetch('airlab.json')
+
+//fetch('https://airlabs.co/api/v9/flights?api_key=02615d93-395d-4ad0-883e-b99d81c413ba&bbox=29.563,33.760,33.321,36.002')
+.then((response) => response.json())
+.then((data) => {
+
+    console.log(data)
+for (i in data.states){
+    L.marker([data.response[i].lng],data.response[i].lng).bindPopup(data.response[i].flight_iata).addTo(map)
+}
+//L.marker([data.states[1][6],data.states[1][5]]).addTo(map)
+})
+
+}
+*/
