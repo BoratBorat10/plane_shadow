@@ -410,6 +410,30 @@ export var airlab = [
             "aircraft_icao": "B77W",
             "updated": 1675702441,
             "status": "en-route"
+        },
+
+        {
+            "hex": "test",
+            "reg_number": "A6-ECE",
+            "flag": "AE",
+            "lat": 32.061996,
+            "lng": 34.77475,
+            "alt": 6050,
+            "dir": 120,
+            "speed": 881,
+            "squawk": "0436",
+            "flight_number": "932",
+            "flight_icao": "UAE932",
+            "flight_iata": "EK932",
+            "dep_icao": "LLBG",
+            "dep_iata": "TLV",
+            "arr_icao": "LLBG",
+            "arr_iata": "DXB",
+            "airline_icao": "UAE",
+            "airline_iata": "EK",
+            "aircraft_icao": "B77W",
+            "updated": 1675702441,
+            "status": "en-route"
         }
     ],
     "terms": "Unauthorized access is prohibited and punishable by law. \nReselling data 'As Is' without AirLabs.Co permission is strictly prohibited. \nFull terms on https://airlabs.co/. \nContact us info@airlabs.co"
