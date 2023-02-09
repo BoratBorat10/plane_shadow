@@ -200,10 +200,9 @@ var testmark2 = L.marker([new_ar[20].lat,new_ar[20].lng]).addTo(map)
 //update the top info row
 
     
-    document.getElementById('date').textContent= sliderdate
-    document.getElementById('sunpos').textContent= `alt: ${sunalt}, azi: ${sunazi+180}, shadow len: ${shadowlen}`
+    document.getElementById('date').textContent= ((sliderdate.toString()).slice(3,21))//cuts off of the GMT part at the end
+    document.getElementById('sunpos').textContent= ` -Alt: ${Math.round(sunalt)}, Azi: ${Math.round(sunazi+180)}`
     
-   
 });
 
 //now button resets date (doesnt work)
@@ -281,7 +280,6 @@ document.getElementById('slider').addEventListener('input', function (){
     };
 
 
-console.log(plane_ar[2].lat)
 
 //draws the yellow connecting lines
 var pointpair2 = []
@@ -289,7 +287,7 @@ var pointpair2 = []
 
 for (var i in track21_ar){
     var pointpair2 = [[track21_ar[i].lat,track21_ar[i].lng],[shaow21_ar[i].lat,shaow21_ar[i].lng]]
-    L.polyline(pointpair2,{color:'yellow'}).addTo(pointline);
+    L.polyline(pointpair2,{color:'red', weight:1}).addTo(pointline);
 
 }
    
