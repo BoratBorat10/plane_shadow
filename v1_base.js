@@ -6,9 +6,6 @@ import * as object from './objects/objects.js';
 
 
 
-navigator.geolocation.getCurrentPosition(function(){console.log(GeolocationPosition)})
-alert(GeolocationPosition)
-
 
 
 var map = L.map('map',{
@@ -151,7 +148,11 @@ function nowlinemove(){
     shadowcalc(plane_ar,now_ar,nowdate)//populates now_ar using the current time param
     var nowlinemove = L.polyline(now_ar,{color:'orange'})
     
-    var nowpos= SunCalc.getPosition(nowdate,plane_ar[i].lat,plane_ar[i].lng) //it was i before 12 and somehow worked- idk
+
+    var nowpos= SunCalc.getPosition(nowdate,plane_ar[21].lat,plane_ar[21].lng) //it was i before 12 and somehow worked- idk
+
+
+
     
     if ((nowpos.altitude* 180.0/Math.PI) > 0){
         nowlinemove.addTo(nowline)
