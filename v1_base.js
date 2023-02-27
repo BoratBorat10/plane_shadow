@@ -151,7 +151,11 @@ function nowlinemove(){
     shadowcalc(plane_ar,now_ar,nowdate)//populates now_ar using the current time param
     var nowlinemove = L.polyline(now_ar,{color:'orange'})
     
+<<<<<<< Updated upstream
     var nowpos= SunCalc.getPosition(nowdate,plane_ar[21].lat,plane_ar[21].lng) //it was i before 12 and somehow worked- idk
+=======
+    var nowpos= SunCalc.getPosition(nowdate,plane_ar[12].lat,plane_ar[12].lng) //it was i before 12 and somehow worked- idk
+>>>>>>> Stashed changes
     
     if ((nowpos.altitude* 180.0/Math.PI) > 0){
         nowlinemove.addTo(nowline)
