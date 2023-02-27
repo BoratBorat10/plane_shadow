@@ -2,7 +2,7 @@ import LatLon, { Nvector, Dms } from 'https://cdn.jsdelivr.net/npm/geodesy@2/lat
 import * as track from './geo_track.js'
 import * as airlab from './airlab.js';
 import * as buffer from './objects/buffers.js';
-import * as object from './objects/objects.js';
+//import * as object from './objects/objects.js';
 
 
 
