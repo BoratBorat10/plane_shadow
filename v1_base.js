@@ -151,7 +151,7 @@ function nowlinemove(){
     shadowcalc(plane_ar,now_ar,nowdate)//populates now_ar using the current time param
     var nowlinemove = L.polyline(now_ar,{color:'orange'})
     
-    var nowpos= SunCalc.getPosition(nowdate,plane_ar[21].lat,plane_ar[21].lng) //it was i before 12 and somehow worked- idk
+    var nowpos= SunCalc.getPosition(nowdate,plane_ar[i].lat,plane_ar[i].lng) //it was i before 12 and somehow worked- idk
     
     if ((nowpos.altitude* 180.0/Math.PI) > 0){
         nowlinemove.addTo(nowline)
@@ -242,7 +242,7 @@ for (i in air_source[0].response){
 }
 
 /*
------time test-----
+-----time test-----.
 console.log('time test:')
 console.log(track.timed12[0].features[0].properties.track_seg_point_id)
 console.log(Date.parse(track.timed12[0].features[0].properties.time))
