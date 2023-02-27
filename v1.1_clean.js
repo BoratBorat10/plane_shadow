@@ -1,8 +1,8 @@
 import LatLon, { Nvector, Dms } from 'https://cdn.jsdelivr.net/npm/geodesy@2/latlon-nvector-spherical.js';
-import * as track from './geo_track.js'
+import * as track from './node_modules/geo_track.js'
 import * as airlab from './airlab.js';
 import * as buffer from './objects/buffers.js';
-import * as object from './objects/objects.js';
+import * as object from './objects/areas.js';
 
 
 
@@ -278,7 +278,7 @@ for (var i in track.track21){
     track21_ar.push({'lat': track.track21[i].geometry.coordinates[1], 'lng': track.track21[i].geometry.coordinates[0], 'ele':track.track21[i].geometry.coordinates[2]})   
 }
 
-//red plane line for 21
+//green plane line for 21
 var line21 = L.polyline(track21_ar,{color:'green', opacity:0.4}).addTo(map)
 
 document.getElementById('slider').addEventListener('input', function (){
