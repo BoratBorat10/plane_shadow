@@ -105,7 +105,7 @@ shadowline.addTo(active_polyline)
 
 
     document.getElementById('date').textContent= date
-    document.getElementById('sunpos').textContent= ` alt: ${sunalt}, azi: ${sunazi+180}, shadow len: ${shadowlen}`
+    document.getElementById('sunpos').textContent= ` alt: ${sunalt}, azi: ${sunazi+180}`
     
    
 });
