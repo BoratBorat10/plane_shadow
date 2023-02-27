@@ -1,16 +1,7 @@
 import LatLon, { Nvector, Dms } from 'https://cdn.jsdelivr.net/npm/geodesy@2/latlon-nvector-spherical.js';
 import * as track from './geo_track.js'
-import * as airlab from './airlab.js';
+import { airlab } from './airlab.js';
 import * as buffer from './objects/buffers.js';
-import * as object from './objects/objects.js';
-
-
-
-navigator.geolocation.getCurrentPosition(function(){console.log(GeolocationPosition)})
-alert(GeolocationPosition)
-
-
-
 var map = L.map('map',{
     center: [32.03993,34.82497],
     zoom: 13
@@ -60,7 +51,6 @@ layerControl.addOverlay(bufferlayer, "Buffers")
 
 L.geoJson(buffer.buffer12, {'color': 'green'}).addTo(bufferlayer);
 L.geoJson(buffer.buffer21).addTo(bufferlayer);
-L.geoJson(buffer.buffer30, {'color': 'yellow'}).addTo(bufferlayer);
 
 //red plane line
 var planeline = L.polyline(plane_ar,{color:'red',}).addTo(map)
@@ -77,15 +67,17 @@ layerControl.addOverlay(rnwy21, "Runway 21");
 function within(point,geojson){
     var latlon_ar = [] //creates a array of latlons
     for (var i in geojson[0].features[0].geometry.coordinates[0][0]){
-       var latlon = new LatLon(geojson[0].features[0].geometry.coordinates[0][i][1],geojson[0].features[0].geometry.coordinates[0][i][0])
+       var latlon = new LatLon(geojson[0].features[0].geometry.coordinates[0][0][i][1],geojson[0].features[0].geometry.coordinates[0][0][i][0])
        latlon_ar.push(latlon) 
        
 
     }
     point.isEnclosedBy(latlon_ar)
     
+    console.log(point.isEnclosedBy(latlon_ar))
     return point.isEnclosedBy(latlon_ar) //returns true or false
 }
+
 
 var shadow_ar = [] //create empty array for shadows;
 
@@ -198,20 +190,18 @@ for (var i in plane_ar){
    
 
 }
-/*
-console.log(object.habima)
-for (var i in new_ar){
-    var point = new LatLon(new_ar[i].lat,new_ar[i].lng)
-    console.log(point)
-    within(point,object.habima)
-}
+
+/*    Markers for testing- diplayes each shadow point for point[20]
+var testmark1 = L.marker([plane_ar[20].lat,plane_ar[20].lng]).addTo(map)
+var testmark2 = L.marker([new_ar[20].lat,new_ar[20].lng]).addTo(map)
 */
+
 
 //update the top info row
 
     
     document.getElementById('date').textContent= ((sliderdate.toString()).slice(3,21))//cuts off of the GMT part at the end
-    document.getElementById('sunpos').textContent= `. Alt: ${Math.round(sunalt)}, Azi: ${Math.round(sunazi+180)}`
+    document.getElementById('sunpos').textContent= ` -Alt: ${Math.round(sunalt)}, Azi: ${Math.round(sunazi+180)}`
     
 });
 
@@ -225,22 +215,23 @@ document.getElementById('nowbutton').onclick =function(date){
 
     
 }
-var air_source= airlab.airlab
+
 
 //every time fetch api button is pressed- this is to minimize api calls
 document.getElementById('fetchbutton').onclick= function(){
 //remove the [0] when working on the real thing
-console.log(air_source[0])
-console.log(air_source[0].response[2].alt)
-for (i in air_source[0].response){
+console.log(airlab[0])
+console.log(airlab[0].response[2].alt)
+for (i in airlab[0].response){
     //if the arrival airport is LLBG and the alt is not 0 (ie. not on the gound)
-    if ((air_source[0].response[i].arr_icao =='LLBG' && air_source[0].response[i].alt > 0 )){
-    L.marker([air_source[0].response[i].lat,air_source[0].response[i].lng]).bindPopup(air_source[0].response[i].hex).addTo(liveplane)
-        console.log("if true:",air_source[0].response[i].hex)
+    if ((airlab[0].response[i].arr_icao =='LLBG' && airlab[0].response[i].alt > 0 )){
+    L.marker([airlab[0].response[i].lat,airlab[0].response[i].lng]).bindPopup(airlab[0].response[i].hex).addTo(liveplane)
+        console.log("if true:",airlab[0].response[i].hex)
 }
 }
 }
 
+<<<<<<< HEAD
 /*
 -----time test-----.
 console.log('time test:')
@@ -251,6 +242,8 @@ for ( i in track.timed12[0].features){
 console.log(`{'${track.timed12[0].features[i].properties.track_seg_point_id}' : ${Date.parse(track.timed12[0].features[i].properties.time)-(Date.parse(track.timed12[0].features[0].properties.time))}}`)
 }
 */
+=======
+>>>>>>> parent of b88f8b3 (put all objects in one file)
 /*    
     //fetch flight data section
 fetch('airlab.json')
