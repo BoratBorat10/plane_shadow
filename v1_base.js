@@ -241,6 +241,8 @@ for (i in air_source[0].response){
 }
 }
 
+/*
+-----time test-----
 console.log('time test:')
 console.log(track.timed12[0].features[0].properties.track_seg_point_id)
 console.log(Date.parse(track.timed12[0].features[0].properties.time))
@@ -248,6 +250,7 @@ for ( i in track.timed12[0].features){
 
 console.log(`{'${track.timed12[0].features[i].properties.track_seg_point_id}' : ${Date.parse(track.timed12[0].features[i].properties.time)-(Date.parse(track.timed12[0].features[0].properties.time))}}`)
 }
+*/
 /*    
     //fetch flight data section
 fetch('airlab.json')
