@@ -12,28 +12,20 @@
      integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM="
      crossorigin=""></script>
      <script src="https://cdnjs.cloudflare.com/ajax/libs/suncalc/1.9.0/suncalc.js"></script>
-     <link href="https://cdn.bootcss.com/noUiSlider/15.6.1/nouislider.min.css" rel="stylesheet">
+     <script src="https://unpkg.com/@turf/turf@6/turf.min.js"></script>
      <script src="https://cdn.bootcss.com/noUiSlider/15.6.1/nouislider.js" type="module"></script>
      <script src="./node_modules/geo_track.js" type="module"></script>
+     <script src="./airlab.js" type="module"></script> 
      <style>
         #map {width: 100%; height: 700px;}
         #slider {width: 100%; height: 20px;}
-        #time-slider-container {width: 100%;}
 
 	</style>
 </head>
 <body>
     <p>Info Row:  <span id="date"></span><span id="sunpos"></span></p>
     
-    <div id="time-slider-container">
-        <div id="time-scale-container"><table id="time-scale"><tbody><tr><td>00<span>:00</span></td><td>01<span>:00</span></td><td>02<span>:00</span></td><td>03<span>:00</span></td><td>04<span>:00</span></td><td>05<span>:00</span></td><td>06<span>:00</span></td><td>07<span>:00</span></td><td>08<span>:00</span></td><td>09<span>:00</span></td><td>10<span>:00</span></td><td>11<span>:00</span></td><td>12<span>:00</span></td><td>13<span>:00</span></td><td>14<span>:00</span></td><td>15<span>:00</span></td><td>16<span>:00</span></td><td>17<span>:00</span></td><td>18<span>:00</span></td><td>19<span>:00</span></td><td>20<span>:00</span></td><td>21<span>:00</span></td><td>22<span>:00</span></td><td>23<span>:00</span></td></tr></tbody></table></div>
-        <div id="time-slider-2" class="ui-slider ui-corner-all ui-slider-horizontal ui-widget ui-widget-content">
-            <div id="time-scale-twilight" style="left: 25.5733%; right: 26.3377%;"></div>
-            <div id="time-scale-twilight-2" style="display: none;"></div>
-            <div id="time-scale-sunlight" style="left: 27.3106%; right: 28.0751%;"></div>
-            <div id="time-scale-sunlight-2" style="display: none;"></div>
-        <span tabindex="0" class="ui-slider-handle ui-corner-all ui-state-default" style="left: 84.1557%;"></span></div>
-    </div>
+  
 
     <div>
   	<input type="range" id="slider" name="slider" 
@@ -41,12 +33,14 @@
   	<p>Value:  <span id="demo"></span></p>
 	</div>
     <button id="nowbutton" type="button">Now</button>
+    <button id="fetchbutton" type="button">Update API</button>
     <div id="map"></div>
     <script type="module" src="./v1_base.js"></script>
-	<h1>Test Text</h1>
+	<h1>Plane Shadow Calc- v1</h1>
+    <h2>Yaron Gefen- Febuary 2023</h2>
 
-    <a  id="metartaf-z7BgB1LE" style="font-size:18px; font-weight:500; color:#000; width:300px; height:435px; display:block">METAR Ben Gurion International Airport</a>
-<script async defer crossorigin="anonymous" src="https://metar-taf.com/embed-js/LLBG?target=z7BgB1LE"></script>
+    <a id="metartaf-cIFwuSJ1" style="font-size:18px; font-weight:500; color:#000; width:300px; height:435px; display:block">METAR Ben Gurion International Airport</a>
+<script async defer crossorigin="anonymous" src="https://metar-taf.com/embed-js/LLBG?target=cIFwuSJ1"></script>
     
 </body>
 </html>
