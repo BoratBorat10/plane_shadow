@@ -6,7 +6,24 @@ import * as object from './objects/areas.js';
 
 
 
+    // Try HTML5 geolocation.
+    function getLocation() {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(showPosition)
+          console.log(navigator)
+          ;
+        } else {
+          alert("Geolocation is not supported by this browser.");
+        }
+      }
+ 
+////
 
+
+const watchID = navigator.geolocation.watchPosition((position) => {
+    console.log(position.coords.latitude, position.coords.longitude);
+    L.marker(position.coords.latitude, position.coords.longitude).addTo(map)
+  });
 
 var map = L.map('map',{
     center: [32.03993,34.82497],
@@ -22,6 +39,7 @@ var slider = document.getElementById("slider");
 var output = document.getElementById("demo");
 output.innerHTML = slider.value; // Display the default slider value
  
+//my loaction marker
 
 //marker testing
 const ele =670
@@ -252,6 +270,7 @@ for ( i in track.timed12[0].features){
 console.log(`{'${track.timed12[0].features[i].properties.track_seg_point_id}' : ${Date.parse(track.timed12[0].features[i].properties.time)-(Date.parse(track.timed12[0].features[0].properties.time))}}`)
 }
 */
+
 /*    
     //fetch flight data section
 fetch('airlab.json')
@@ -302,7 +321,7 @@ document.getElementById('slider').addEventListener('input', function (){
 
 
 
-//draws the yellow connecting lines
+//draws the yellow connecting lines for rnwy21
 var pointpair2 = []
 
 
