@@ -17,8 +17,7 @@ attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStree
 
 //new slider
 var slider = document.getElementById("slider");
-var output = document.getElementById("demo");
-output.innerHTML = slider.value; // Display the default slider value
+
  
 //slider arbitary loaction
 const ele = 670
@@ -265,6 +264,9 @@ for (i in air_source[0].response){
         L.rotatedMarker([shaodowpoint[0],shaodowpoint[1]],{icon: planeicon,rotationAngle: air_source[0].response[i].dir, opacity:50}).addTo(liveplane);
 }
 }
+
+var output = document.getElementById("apiCallsLeft");
+output.innerHTML = air_source[0].request.key.limits_total; // how many api calls left for mounth
 }
 
 
