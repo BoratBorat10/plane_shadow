@@ -276,8 +276,10 @@ for (i in air_source[0].response){
 document.getElementById('posButton').onclick= function(){
 
 const successCallback = (position) => {
-    console.log(position.coords.latitude,position.coords.longitude);
+    console.log(position.coords.latitude,position.coords.accuracy);
     L.marker([position.coords.latitude,position.coords.longitude]).addTo(map);
+    L.circle([position.coords.latitude,position.coords.longitude],{radius:position.coords.accuracy}).addTo(map);
+    map.flyTo([position.coords.latitude,position.coords.longitude]);
   };
   
   const errorCallback = (error) => {
