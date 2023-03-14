@@ -1,11 +1,11 @@
 import LatLon, { Nvector, Dms } from 'https://cdn.jsdelivr.net/npm/geodesy@2/latlon-nvector-spherical.js';
+import './node_modules/leaflet-marker-rotation/src/rotatedMarker.js';
 import * as track from './node_modules/geo_track.js'
 import * as airlab from './airlab.js';
 import * as buffer from './objects/buffers.js';
 import * as object from './objects/areas.js';
 
-
-
+/*
     // Try HTML5 geolocation.
     function getLocation() {
         if (navigator.geolocation) {
@@ -25,6 +25,8 @@ const watchID = navigator.geolocation.watchPosition((position) => {
     L.marker(position.coords.latitude, position.coords.longitude).addTo(map)
   });
 
+console.log(navigator.geolocation.coordinates)
+*/
 var map = L.map('map',{
     center: [32.03993,34.82497],
     zoom: 13
@@ -84,7 +86,14 @@ var planeline = L.polyline(plane_ar,{color:'red',}).addTo(map)
 var rnwy21 = L.layerGroup()
 layerControl.addOverlay(rnwy21, "Runway 21");
 
+//plane icon
+var planeicon = L.icon({
+    iconUrl: 'https://upload.wikimedia.org/wikipedia/commons/1/17/Plane_icon_nose_up.svg',
+    iconSize: [28,25],
+    iconAnchor: [12,12]
+    
 
+})
 
 
 
@@ -254,7 +263,11 @@ console.log(air_source[0].response[2].alt)
 for (i in air_source[0].response){
     //if the arrival airport is LLBG and the alt is not 0 (ie. not on the gound)
     if ((air_source[0].response[i].arr_icao =='LLBG' && air_source[0].response[i].alt > 0 )){
-    L.marker([air_source[0].response[i].lat,air_source[0].response[i].lng]).bindPopup(air_source[0].response[i].hex).addTo(liveplane)
+    L.rotatedMarker([air_source[0].response[i].lat,air_source[0].response[i].lng],
+         {icon: planeicon,
+         rotationAngle: air_source[0].response[i].dir})
+         .bindPopup(air_source[0].response[i].hex)
+         .addTo(liveplane)
         console.log("if true:",air_source[0].response[i].hex)
 }
 }
