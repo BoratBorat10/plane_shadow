@@ -273,12 +273,14 @@ for (i in air_source[0].response){
 
 
 //GPS button- get location
+var gpsLayer = L.layerGroup().addTo(map);
 document.getElementById('posButton').onclick= function(){
-
-const successCallback = (position) => {
+   
+    const successCallback = (position) => {
+    gpsLayer.clearLayers();
     console.log(position.coords.latitude,position.coords.accuracy);
-    L.marker([position.coords.latitude,position.coords.longitude]).addTo(map);
-    L.circle([position.coords.latitude,position.coords.longitude],{radius:position.coords.accuracy}).addTo(map);
+    L.marker([position.coords.latitude,position.coords.longitude]).addTo(gpsLayer);
+    L.circle([position.coords.latitude,position.coords.longitude],{radius:position.coords.accuracy}).addTo(gpsLayer);
     map.flyTo([position.coords.latitude,position.coords.longitude]);
   };
   
