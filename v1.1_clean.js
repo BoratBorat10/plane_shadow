@@ -20,8 +20,8 @@ var slider = document.getElementById("slider");
 var output = document.getElementById("demo");
 output.innerHTML = slider.value; // Display the default slider value
  
-//my loaction marker
-
+//slider arbitary loaction
+const ele = 670
 
 //create plane array
 const plane_ar = []
@@ -141,6 +141,18 @@ for (var i in start_array){
 }
 }
 
+function shadowcalcPoint(time,lat1,lon1,ele){
+    var sunpos= SunCalc.getPosition(time,lat1,lon1)
+    var sunazi =  ((sunpos.azimuth * (180.0/Math.PI))) //0 is south so 180 needs to be added- took me hours to get this
+    var sunalt =  (sunpos.altitude * 180.0/Math.PI)
+    var shadowlen = (ele / Math.tan(sunpos.altitude))
+    var endpoint = new LatLon(lat1,lon1).destinationPoint(shadowlen,(sunazi))
+   
+    var lat2 = endpoint._lat
+    var lon2 = endpoint._lon
+    return [lat2, lon2]
+   
+}
 
 //the now orange line
 setInterval(nowlinemove,250)//updates everysecond
@@ -233,7 +245,8 @@ var air_source= airlab.airlab
 
 //every time fetch api button is pressed- this is to minimize api calls
 document.getElementById('fetchbutton').onclick= function(){
-//remove the [0] when working on the real thing
+liveplane.clearLayers();   
+ //remove the [0] when working on the real thing
 console.log(air_source[0])
 console.log(air_source[0].response[2].alt)
 for (i in air_source[0].response){
@@ -242,11 +255,14 @@ for (i in air_source[0].response){
     L.rotatedMarker([air_source[0].response[i].lat,air_source[0].response[i].lng],
          {icon: planeicon,
          rotationAngle: air_source[0].response[i].dir})
-         .bindPopup(air_source[0].response[i].hex,
-            
-            )
+         .bindPopup(air_source[0].response[i].hex,)
          .addTo(liveplane)
         console.log("if true:",air_source[0].response[i].hex)
+
+        //add shadow for each plane
+        var shaodowpoint =( shadowcalcPoint(air_source[0].response[i].updated,air_source[0].response[i].lat,air_source[0].response[i].lng,air_source[0].response[i].alt))
+        console.log(shaodowpoint[0])
+        L.rotatedMarker([shaodowpoint[0],shaodowpoint[1]],{icon: planeicon,rotationAngle: air_source[0].response[i].dir, opacity:50}).addTo(liveplane);
 }
 }
 }
