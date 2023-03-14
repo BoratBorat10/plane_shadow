@@ -5,28 +5,7 @@ import * as airlab from './airlab.js';
 import * as buffer from './objects/buffers.js';
 import * as object from './objects/areas.js';
 
-/*
-    // Try HTML5 geolocation.
-    function getLocation() {
-        if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition(showPosition)
-          console.log(navigator)
-          ;
-        } else {
-          alert("Geolocation is not supported by this browser.");
-        }
-      }
- 
-////
 
-
-const watchID = navigator.geolocation.watchPosition((position) => {
-    console.log(position.coords.latitude, position.coords.longitude);
-    L.marker(position.coords.latitude, position.coords.longitude).addTo(map)
-  });
-
-console.log(navigator.geolocation.coordinates)
-*/
 var map = L.map('map',{
     center: [32.03993,34.82497],
     zoom: 13
@@ -42,7 +21,6 @@ var output = document.getElementById("demo");
 output.innerHTML = slider.value; // Display the default slider value
  
 //my loaction marker
-
 
 
 //create plane array
@@ -264,7 +242,9 @@ for (i in air_source[0].response){
     L.rotatedMarker([air_source[0].response[i].lat,air_source[0].response[i].lng],
          {icon: planeicon,
          rotationAngle: air_source[0].response[i].dir})
-         .bindPopup(air_source[0].response[i].hex)
+         .bindPopup(air_source[0].response[i].hex,
+            
+            )
          .addTo(liveplane)
         console.log("if true:",air_source[0].response[i].hex)
 }
@@ -278,10 +258,17 @@ document.getElementById('posButton').onclick= function(){
    
     const successCallback = (position) => {
     gpsLayer.clearLayers();
-    console.log(position.coords.latitude,position.coords.accuracy);
-    L.marker([position.coords.latitude,position.coords.longitude]).addTo(gpsLayer);
-    L.circle([position.coords.latitude,position.coords.longitude],{radius:position.coords.accuracy}).addTo(gpsLayer);
-    map.flyTo([position.coords.latitude,position.coords.longitude]);
+    
+    //var gpslat = position.coords.latitude
+   // var gpslon = position.coords.longitude
+        //testing on rambam
+    var gpslat = 32.0701889
+    var gpslon = 34.7726968
+
+    L.marker([gpslat,gpslon]).addTo(gpsLayer);
+    L.circle([gpslat,gpslon],{radius:position.coords.accuracy}).addTo(gpsLayer);
+    map.flyTo([gpslat,gpslon],18); //turned of for testing
+    
   };
   
   const errorCallback = (error) => {
@@ -289,9 +276,15 @@ document.getElementById('posButton').onclick= function(){
   };
   
   navigator.geolocation.getCurrentPosition(successCallback, errorCallback);//marker testing
-const ele =670
 }
 
+//ATIS audio button
+const atis = new Audio('./recordings/edds-atis-77073.mp3');
+document.getElementById('atisButton').onclick= function(){
+atis.play()
+
+
+}
 
 /*
 -----time test-----.
