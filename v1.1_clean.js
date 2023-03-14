@@ -43,8 +43,6 @@ output.innerHTML = slider.value; // Display the default slider value
  
 //my loaction marker
 
-//marker testing
-const ele =670
 
 
 //create plane array
@@ -272,6 +270,24 @@ for (i in air_source[0].response){
 }
 }
 }
+
+
+//GPS button- get location
+document.getElementById('posButton').onclick= function(){
+
+const successCallback = (position) => {
+    console.log(position.coords.latitude,position.coords.longitude);
+    L.marker([position.coords.latitude,position.coords.longitude]).addTo(map);
+  };
+  
+  const errorCallback = (error) => {
+    console.log(error);
+  };
+  
+  navigator.geolocation.getCurrentPosition(successCallback, errorCallback);//marker testing
+const ele =670
+}
+
 
 /*
 -----time test-----.
