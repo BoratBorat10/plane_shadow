@@ -240,46 +240,43 @@ document.getElementById('nowbutton').onclick =function(date){
 
     
 }
-
+//runway decte takes a lat lon, and for the 3 buffer checks if within
 function rnwDetect(lat,lon){
-
-
-return activeRnw
-}
-
+for (i in buffer){
+    //32.061996,34.77475
+    if(within(lat,lon,buffer[i])){
+        return buffer[i][0].name//reterun name of active runway
+    }
+    //else{return "not in"}
+}} 
 
 var air_source= airlab.airlab
 
 //every time fetch api button is pressed- this is to minimize api calls
 document.getElementById('fetchbutton').onclick= function(){
-liveplane.clearLayers();   
- //remove the [0] when working on the real thing
-console.log(air_source[0])
-console.log(air_source[0].response[2].alt)
+liveplane.clearLayers();
+
+//remove the [0] when working on the real thing
 for (i in air_source[0].response){
     //if the arrival airport is LLBG and the alt is not 0 (ie. not on the gound)
     if ((air_source[0].response[i].arr_icao =='LLBG' && air_source[0].response[i].alt > 0 )){
     L.rotatedMarker([air_source[0].response[i].lat,air_source[0].response[i].lng],
          {icon: planeicon,
          rotationAngle: air_source[0].response[i].dir})
-         .bindPopup(air_source[0].response[i].hex,)
+         .bindPopup(air_source[0].response[i].hex)
          .addTo(liveplane)
-        console.log("if true:",air_source[0].response[i].hex)
+        //console.log("if true:",air_source[0].response[i].hex)
 
         //add shadow for each plane
         var shaodowpoint =( shadowcalcPoint(air_source[0].response[i].updated,air_source[0].response[i].lat,air_source[0].response[i].lng,air_source[0].response[i].alt))
-        console.log(shaodowpoint[0])
         L.rotatedMarker([shaodowpoint[0],shaodowpoint[1]],{icon: planeicon,rotationAngle: air_source[0].response[i].dir, opacity:50}).addTo(liveplane);
 
-        setInterval(planeUpdate,1000)
-        function planeUpdate(){
-           console.log(air_source[0].response[i].hex)
-        }
+        console.log(air_source[0].response[i].hex,rnwDetect(air_source[0].response[i].lat,air_source[0].response[i].lng))
+        
 
 
 
 }
-
 }
 
 var output = document.getElementById("apiCallsLeft");
