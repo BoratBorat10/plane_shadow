@@ -255,7 +255,6 @@ var air_source= airlab.airlab
 //every time fetch api button is pressed- this is to minimize api calls
 document.getElementById('fetchbutton').onclick= function(){
 liveplane.clearLayers();
-
 //remove the [0] when working on the real thing
 for (i in air_source[0].response){
     //if the arrival airport is LLBG and the alt is not 0 (ie. not on the gound)
@@ -272,6 +271,7 @@ for (i in air_source[0].response){
         L.rotatedMarker([shaodowpoint[0],shaodowpoint[1]],{icon: planeicon,rotationAngle: air_source[0].response[i].dir, opacity:50}).addTo(liveplane);
 
         console.log(air_source[0].response[i].hex,rnwDetect(air_source[0].response[i].lat,air_source[0].response[i].lng))
+        //i need to find a way to get it out of this for loop
         
 
 
