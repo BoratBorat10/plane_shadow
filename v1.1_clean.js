@@ -71,20 +71,24 @@ var planeicon = L.icon({
 })
 
 
-
 //fuction takes a point and a geojson of a buffer and retuns true if within
-function within(point,geojson){
+function within(lat,lon,geojson){
+    var point = new LatLon(lat,lon)
     var latlon_ar = [] //creates a array of latlons
     for (var i in geojson[0].features[0].geometry.coordinates[0][0]){
-       var latlon = new LatLon(geojson[0].features[0].geometry.coordinates[0][i][1],geojson[0].features[0].geometry.coordinates[0][i][0])
+       var latlon = new LatLon(geojson[0].features[0].geometry.coordinates[0][0][i][1],geojson[0].features[0].geometry.coordinates[0][0][i][0])
        latlon_ar.push(latlon) 
-       
 
     }
     point.isEnclosedBy(latlon_ar)
     
     return point.isEnclosedBy(latlon_ar) //returns true or false
 }
+
+
+
+console.log(within(32.061996,34.77475,buffer.buffer12))
+
 
 var shadow_ar = [] //create empty array for shadows;
 
@@ -115,15 +119,14 @@ document.getElementById('slider').addEventListener('input', function (){
     // the slider supplies 0-23 number and this corresoponds to a hour of the day that is re set
 });
 
-//chnages the value diaplay under the slider
+
 slider.oninput = function() {
-    output.innerHTML = this.value;
     pointline.clearLayers()//clears the yellow connecting line- just stuck in here and is somehow works to clear them beofre the next one is drawn
 
 } 
 
 
-//function that takes a point and reterns its shadow point
+//function that takes a array and reterns its shadow point array
 function shadowcalc(start_array,end_array,time){
 for (var i in start_array){
 
@@ -139,7 +142,7 @@ for (var i in start_array){
     end_array.push({'lat': endpoint._lat, 'lng': endpoint._lon, 'shadowlen': shadowlen})
 }
 }
-
+//same but with a single point
 function shadowcalcPoint(time,lat1,lon1,ele){
     var sunpos= SunCalc.getPosition(time,lat1,lon1)
     var sunazi =  ((sunpos.azimuth * (180.0/Math.PI))) //0 is south so 180 needs to be added- took me hours to get this
@@ -165,9 +168,6 @@ function nowlinemove(){
 
     var nowpos= SunCalc.getPosition(nowdate,plane_ar[21].lat,plane_ar[21].lng) //it was i before 12 and somehow worked- idk
 
-
-
-    
     if ((nowpos.altitude* 180.0/Math.PI) > 0){
         nowlinemove.addTo(nowline)
         };
@@ -240,6 +240,14 @@ document.getElementById('nowbutton').onclick =function(date){
 
     
 }
+
+function rnwDetect(lat,lon){
+
+
+return activeRnw
+}
+
+
 var air_source= airlab.airlab
 
 //every time fetch api button is pressed- this is to minimize api calls
@@ -262,7 +270,16 @@ for (i in air_source[0].response){
         var shaodowpoint =( shadowcalcPoint(air_source[0].response[i].updated,air_source[0].response[i].lat,air_source[0].response[i].lng,air_source[0].response[i].alt))
         console.log(shaodowpoint[0])
         L.rotatedMarker([shaodowpoint[0],shaodowpoint[1]],{icon: planeicon,rotationAngle: air_source[0].response[i].dir, opacity:50}).addTo(liveplane);
+
+        setInterval(planeUpdate,1000)
+        function planeUpdate(){
+           console.log(air_source[0].response[i].hex)
+        }
+
+
+
 }
+
 }
 
 var output = document.getElementById("apiCallsLeft");
@@ -293,7 +310,7 @@ document.getElementById('posButton').onclick= function(){
     console.log(error);
   };
   
-  navigator.geolocation.getCurrentPosition(successCallback, errorCallback);//marker testing
+  navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
 }
 
 //ATIS audio button
@@ -315,11 +332,10 @@ console.log(`{'${track.timed12[0].features[i].properties.track_seg_point_id}' : 
 }
 */
 
-/*    
+/*
     //fetch flight data section
-fetch('airlab.json')
 
-//fetch('https://airlabs.co/api/v9/flights?api_key=02615d93-395d-4ad0-883e-b99d81c413ba&bbox=29.563,33.760,33.321,36.002')
+fetch('https://airlabs.co/api/v9/flights?api_key=02615d93-395d-4ad0-883e-b99d81c413ba&bbox=29.563,33.760,33.321,36.002')
 .then((response) => response.json())
 .then((data) => {
 
@@ -330,8 +346,8 @@ for (i in data.states){
 //L.marker([data.states[1][6],data.states[1][5]]).addTo(map)
 })
 
-}
 */
+
 
 
 
