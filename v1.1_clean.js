@@ -86,15 +86,18 @@ function within(lat,lon,geojson){
 }
 
 
-
-console.log(within(32.061996,34.77475,buffer.buffer12))
-
+//fr data test
+for (var i in airlab.flightRadar[0] ){
+//console.log(airlab.flightRadar[0][i][13])
+}
 
 var shadow_ar = [] //create empty array for shadows;
 
 
 
 const date = new Date() //takes curent date
+const sunnow = SunCalc.getPosition(date,32.068056, 34.769150)
+console.log(date)
 
 var  sliderdate = new Date(date)
 
@@ -102,10 +105,6 @@ var  sliderdate = new Date(date)
 
   
 
-//var sunpos= SunCalc.getPosition(date,plane_ar[1].lat,plane_ar[1].lng)
-//var sunalt =  (sunpos.altitude * 180.0/Math.PI)
-
-//console.log(sunalt)
 
 
 //chnages the date with the slider
@@ -250,37 +249,50 @@ for (i in buffer){
     //else{return "not in"}
 }} 
 
-var air_source= airlab.airlab
+//var air_source= airlab.airlab
 
 //every time fetch api button is pressed- this is to minimize api calls
-document.getElementById('fetchbutton').onclick= function(){
+document.getElementById('fetchbutton').onclick= async function(){
 liveplane.clearLayers();
-//remove the [0] when working on the real thing
-for (i in air_source[0].response){
+//api_key=02615d93-395d-4ad0-883e-b99d81c413ba
+fetch('https://airlabs.co/api/v9/flights?api_key=02615d93-395d-4ad0-883e-b99d81c413ba&bbox=29.563,33.760,33.321,36.002')
+.then((response) => response.json())
+.then((air_source) => {
+
+    console.log(air_source)
+
+
+
+
+for (i in air_source.response){
     //if the arrival airport is LLBG and the alt is not 0 (ie. not on the gound)
-    if ((air_source[0].response[i].arr_icao =='LLBG' && air_source[0].response[i].alt > 0 )){
-    L.rotatedMarker([air_source[0].response[i].lat,air_source[0].response[i].lng],
+    if ((air_source.response[i].arr_icao =='LLBG' && air_source.response[i].alt > 0 )){
+    L.rotatedMarker([air_source.response[i].lat,air_source.response[i].lng],
          {icon: planeicon,
-         rotationAngle: air_source[0].response[i].dir})
-         .bindPopup(air_source[0].response[i].hex)
+         rotationAngle: air_source.response[i].dir})
+         .bindPopup(air_source.response[i].hex)
          .addTo(liveplane)
         //console.log("if true:",air_source[0].response[i].hex)
 
-        //add shadow for each plane
-        var shaodowpoint =( shadowcalcPoint(air_source[0].response[i].updated,air_source[0].response[i].lat,air_source[0].response[i].lng,air_source[0].response[i].alt))
-        L.rotatedMarker([shaodowpoint[0],shaodowpoint[1]],{icon: planeicon,rotationAngle: air_source[0].response[i].dir, opacity:50}).addTo(liveplane);
+        //add shadow for each plane only when sun is up
+        console.log('shdowpoint:',air_source.response[i].updated,air_source.response[i].lat,air_source.response[i].lng,air_source.response[i].alt)
+        var shaodowpoint =( shadowcalcPoint(air_source.response[i].updated,air_source.response[i].lat,air_source.response[i].lng,air_source.response[i].alt))
+        if(sunnow.altitude> 0){
+        L.rotatedMarker([shaodowpoint[0],shaodowpoint[1]],{icon: planeicon,rotationAngle: air_source.response[i].dir, opacity:50}).addTo(liveplane)};
 
-        console.log(air_source[0].response[i].hex,rnwDetect(air_source[0].response[i].lat,air_source[0].response[i].lng))
+        console.log(air_source.response[i].hex,rnwDetect(air_source.response[i].lat,air_source.response[i].lng))
         //i need to find a way to get it out of this for loop
         
+        var output = document.getElementById("apiCallsLeft");
+        output.innerHTML =  air_source.request.key.limits_total; // how many api calls left for mounth
 
 
 
 }
 }
+})
 
-var output = document.getElementById("apiCallsLeft");
-output.innerHTML = air_source[0].request.key.limits_total; // how many api calls left for mounth
+
 }
 
 
