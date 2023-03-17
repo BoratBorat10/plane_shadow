@@ -250,10 +250,32 @@ for (i in buffer){
 }} 
 
 //var air_source= airlab.airlab
+console.log(airlab.airlab[0].response.length)
+
+
+
+airlab.airlab[0].response.forEach((plane,i)=>{ 
+    console.log(plane.lat)
+    var t = 0
+    var lat = plane.lat
+    var lng = plane.lng
+    console.log(lat,lng)
+    setInterval(function(){
+    //liveplane.clearLayers();
+
+        lat = lat +0.0001
+        lng = lng +0.0001
+        //liveplane.clearLayers()
+        L.marker([lat,lng]).bindPopup(plane.hex).addTo(liveplane)
+
+    },1500);
+
+})
+
 
 //every time fetch api button is pressed- this is to minimize api calls
 document.getElementById('fetchbutton').onclick= async function(){
-liveplane.clearLayers();
+
 //api_key=02615d93-395d-4ad0-883e-b99d81c413ba
 fetch('https://airlabs.co/api/v9/flights?api_key=02615d93-395d-4ad0-883e-b99d81c413ba&bbox=29.563,33.760,33.321,36.002')
 .then((response) => response.json())
@@ -262,39 +284,59 @@ fetch('https://airlabs.co/api/v9/flights?api_key=02615d93-395d-4ad0-883e-b99d81c
     console.log(air_source)
 
 
-
-
+    liveplane.clearLayers();
 for (i in air_source.response){
     //if the arrival airport is LLBG and the alt is not 0 (ie. not on the gound)
     if ((air_source.response[i].arr_icao =='LLBG' && air_source.response[i].alt > 0 )){
-    L.rotatedMarker([air_source.response[i].lat,air_source.response[i].lng],
+    
+        
+      
+        L.rotatedMarker([air_source.response[i].lat,air_source.response[i].lng],
          {icon: planeicon,
          rotationAngle: air_source.response[i].dir})
-         .bindPopup(air_source.response[i].hex)
+         .bindPopup((air_source.response[i].hex+'<br>'+
+                    air_source.response[i].flight_icao+'<br>'+
+                    air_source.response[i].dep_iata+' to '+air_source.response[i].arr_iata+'<br>'))
          .addTo(liveplane)
         //console.log("if true:",air_source[0].response[i].hex)
 
         //add shadow for each plane only when sun is up
-        console.log('shdowpoint:',air_source.response[i].updated,air_source.response[i].lat,air_source.response[i].lng,air_source.response[i].alt)
         var shaodowpoint =( shadowcalcPoint(air_source.response[i].updated,air_source.response[i].lat,air_source.response[i].lng,air_source.response[i].alt))
         if(sunnow.altitude> 0){
         L.rotatedMarker([shaodowpoint[0],shaodowpoint[1]],{icon: planeicon,rotationAngle: air_source.response[i].dir, opacity:50}).addTo(liveplane)};
 
-        console.log(air_source.response[i].hex,rnwDetect(air_source.response[i].lat,air_source.response[i].lng))
+      
+
+        console.log(air_source.response[i].flight_icao,rnwDetect(air_source.response[i].lat,air_source.response[i].lng))
         //i need to find a way to get it out of this for loop
         
-        var output = document.getElementById("apiCallsLeft");
+        
+
+
+
+
+}//end the if
+else(console.log('no planes landing'))
+}//ends the for
+var output = document.getElementById("apiCallsLeft");
         output.innerHTML =  air_source.request.key.limits_total; // how many api calls left for mounth
+})//ends the fetch async
+}// ends onclick function
 
 
+//test marker
+var lat = 32.1 
+var lan = 34.8
+setInterval((function(){
+    
+    lat = lat +0.0001
+    lan = lan +0.0001
+    L.marker([lat,lan]).addTo(liveplane)
+    
+    console.log(lat,lan)
 
-}
-}
-})
 
-
-}
-
+}),5000)
 
 //GPS button- get location
 var gpsLayer = L.layerGroup().addTo(map);
