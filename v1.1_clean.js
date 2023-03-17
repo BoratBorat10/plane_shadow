@@ -250,7 +250,7 @@ for (i in buffer){
 }} 
 
 //var air_source= airlab.airlab
-console.log(airlab.airlab[0].response.length)
+console.log(airlab.airlab[0].response[1].speed)
 
 
 function planeDraw(airlab){
@@ -259,34 +259,34 @@ airlab.response.forEach((plane,i)=>{
 var lat = plane.lat
 var lon = plane.lng
 var t =0
+var planeMarker = L.rotatedMarker([lat,lon],{icon: planeicon,
+    rotationAngle: plane.dir}).bindPopup(plane.hex)
+
 
 setInterval(function(){
     t ++ 
     
     //setTimeout(() => {liveplane.clearLayers()}, 910);
-    console.log(plane.hex,i,t)
    
-    console.log(0.05+t)
-
-    var start = new LatLon(lat,lon).destinationPoint(83*t, plane.dir)
-    console.log(start._lon)
-   this.mrk = L.rotatedMarker([start._lat,start._lon],{icon: planeicon,
-    rotationAngle: plane.dir}).bindPopup(plane.hex)
+    var speed = plane.speed/3.6 //to get meter per second
+    console.log(speed)
+    var start = new LatLon(lat,lon).destinationPoint(speed*t, plane.dir)
+    planeMarker.setLatLng([start._lat,start._lon])
 
 
-   //liveplane.clearLayers();
-   this.mrk.addTo(liveplane)
+
    
 
 },1000);
-
-
+planeMarker.addTo(liveplane)
 })
 
 
 }// plane draw function
 
 
+
+/*
 
 airlab.airlab[0].response.forEach((plane,i)=>{ 
     //liveplane.clearLayers();
@@ -303,12 +303,9 @@ airlab.airlab[0].response.forEach((plane,i)=>{
         t ++ 
         
         
-        console.log(plane.hex,i,t)
        
-        console.log(0.05+t)
 
         var start = new LatLon(lat,lng).destinationPoint(41*t, plane.dir)
-        console.log(start._lon)
        
 
         planeMarker.setLatLng([start._lat,start._lon])
@@ -318,7 +315,7 @@ airlab.airlab[0].response.forEach((plane,i)=>{
     
     },500);
     planeMarker.addTo(liveplane)})
-
+*/
 
 //every time fetch api button is pressed- this is to minimize api calls
 document.getElementById('fetchbutton').onclick= async function(){
@@ -385,7 +382,6 @@ setInterval((function(){
     lan = lan +0.0001
     markerT.setLatLng([lat,lan])
     
-    console.log(lat,lan)
 
 
 }),500)
