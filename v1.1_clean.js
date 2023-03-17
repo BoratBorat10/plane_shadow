@@ -253,24 +253,71 @@ for (i in buffer){
 console.log(airlab.airlab[0].response.length)
 
 
+function planeDraw(airlab){
+
+airlab.response.forEach((plane,i)=>{
+var lat = plane.lat
+var lon = plane.lng
+var t =0
+
+setInterval(function(){
+    t ++ 
+    
+    //setTimeout(() => {liveplane.clearLayers()}, 910);
+    console.log(plane.hex,i,t)
+   
+    console.log(0.05+t)
+
+    var start = new LatLon(lat,lon).destinationPoint(83*t, plane.dir)
+    console.log(start._lon)
+   this.mrk = L.rotatedMarker([start._lat,start._lon],{icon: planeicon,
+    rotationAngle: plane.dir}).bindPopup(plane.hex)
+
+
+   //liveplane.clearLayers();
+   this.mrk.addTo(liveplane)
+   
+
+},1000);
+
+
+})
+
+
+}// plane draw function
+
+
 
 airlab.airlab[0].response.forEach((plane,i)=>{ 
+    //liveplane.clearLayers();
     console.log(plane.lat)
-    var t = 0
+    let t =0
     var lat = plane.lat
     var lng = plane.lng
     console.log(lat,lng)
+    var planeMarker = L.rotatedMarker([lat,lng],{icon: planeicon,
+        rotationAngle: plane.dir}).bindPopup(plane.hex)
+
+    //i understood the probem: the for loop clears the layer everytime but only one plnae is added each loop
     setInterval(function(){
-    //liveplane.clearLayers();
+        t ++ 
+        
+        
+        console.log(plane.hex,i,t)
+       
+        console.log(0.05+t)
 
-        lat = lat +0.0001
-        lng = lng +0.0001
-        //liveplane.clearLayers()
-        L.marker([lat,lng]).bindPopup(plane.hex).addTo(liveplane)
+        var start = new LatLon(lat,lng).destinationPoint(41*t, plane.dir)
+        console.log(start._lon)
+       
 
-    },1500);
-
-})
+        planeMarker.setLatLng([start._lat,start._lon])
+       //liveplane.clearLayers();
+       
+       
+    
+    },500);
+    planeMarker.addTo(liveplane)})
 
 
 //every time fetch api button is pressed- this is to minimize api calls
@@ -305,7 +352,8 @@ for (i in air_source.response){
         if(sunnow.altitude> 0){
         L.rotatedMarker([shaodowpoint[0],shaodowpoint[1]],{icon: planeicon,rotationAngle: air_source.response[i].dir, opacity:50}).addTo(liveplane)};
 
-      
+        liveplane.clearLayers()    
+        planeDraw(air_source)
 
         console.log(air_source.response[i].flight_icao,rnwDetect(air_source.response[i].lat,air_source.response[i].lng))
         //i need to find a way to get it out of this for loop
@@ -327,16 +375,20 @@ var output = document.getElementById("apiCallsLeft");
 //test marker
 var lat = 32.1 
 var lan = 34.8
+var markerT = L.marker([lat,lan])
+
+markerT.addTo(liveplane)
+
 setInterval((function(){
-    
+    //liveplane.clearLayers()
     lat = lat +0.0001
     lan = lan +0.0001
-    L.marker([lat,lan]).addTo(liveplane)
+    markerT.setLatLng([lat,lan])
     
     console.log(lat,lan)
 
 
-}),5000)
+}),500)
 
 //GPS button- get location
 var gpsLayer = L.layerGroup().addTo(map);
