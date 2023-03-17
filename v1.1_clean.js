@@ -393,11 +393,11 @@ document.getElementById('posButton').onclick= function(){
     const successCallback = (position) => {
     gpsLayer.clearLayers();
     
-    //var gpslat = position.coords.latitude
-   // var gpslon = position.coords.longitude
+    var gpslat = position.coords.latitude
+   var gpslon = position.coords.longitude
         //testing on rambam
-    var gpslat = 32.0701889
-    var gpslon = 34.7726968
+    //var gpslat = 32.0701889
+    //var gpslon = 34.7726968
 
     L.marker([gpslat,gpslon]).addTo(gpsLayer);
     L.circle([gpslat,gpslon],{radius:position.coords.accuracy}).addTo(gpsLayer);
