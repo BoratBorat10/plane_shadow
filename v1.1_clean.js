@@ -62,13 +62,18 @@ var planeline = L.polyline(plane_ar,{color:'red',}).addTo(map)
 var rnwy21 = L.layerGroup()
 layerControl.addOverlay(rnwy21, "Runway 21");
 
-//plane icon
+//plane icons
 var planeicon = L.icon({
-    iconUrl: 'https://upload.wikimedia.org/wikipedia/commons/1/17/Plane_icon_nose_up.svg',
+    iconUrl: './black_plane_icon.svg',
     iconSize: [28,25],
     iconAnchor: [12,12]
-    
+})
 
+
+var blueplane = L.icon({
+    iconUrl: './blue_plane_icon.svg',
+    iconSize: [28,25],
+    iconAnchor: [12,12]
 })
 
 
@@ -261,7 +266,7 @@ var planeMarker = L.rotatedMarker([lat,lon],{icon: planeicon,
                     airlab.response[i].dep_iata+' to '+airlab.response[i].arr_iata+'<br>'))
 
 
-var shadowMarker = L.rotatedMarker([lat,lon],{icon: planeicon,rotationAngle: airlab.response[i].dir, opacity:0.3}).bindPopup('shadow');
+var shadowMarker = L.rotatedMarker([lat,lon],{icon: planeicon,rotationAngle: airlab.response[i].dir, opacity:0.3}).bindPopup(airlab.response[i].flight_icao + ' shadow');
 
 
 
@@ -272,7 +277,7 @@ setInterval(function(){
     
     //setTimeout(() => {liveplane.clearLayers()}, 910);
    
-    var speed = plane.speed/3.6 //to get meter per second
+    var speed = (plane.speed/(3.6/2)) //to get meter per second
     var start = new LatLon(lat,lon).destinationPoint(speed*t, plane.dir)
     planeMarker.setLatLng([start._lat,start._lon])
 
@@ -289,12 +294,14 @@ setInterval(function(){
 
    
 
-},1000);
+},500);
 
 
 //if ((airlab.response[i].arr_icao =='LLBG' && airlab.response[i].alt > 0 )){planeMarker.addTo(liveplane)}
+if( airlab.response[i].alt > 1){
 planeMarker.addTo(liveplane)
-shadowMarker.addTo(map)
+shadowMarker.addTo(liveplane)}
+
 
 })
 
@@ -318,27 +325,14 @@ fetch('https://airlabs.co/api/v9/flights?api_key=02615d93-395d-4ad0-883e-b99d81c
     liveplane.clearLayers();
 for (i in air_source.response){
     //if the arrival airport is LLBG and the alt is not 0 (ie. not on the gound)
-    if ((air_source.response[i].arr_icao =='LLBG' && air_source.response[i].alt > 0 )){
+  
     
         
       
-        L.rotatedMarker([air_source.response[i].lat,air_source.response[i].lng],
-         {icon: planeicon,
-         rotationAngle: air_source.response[i].dir})
-         .bindPopup((air_source.response[i].hex+'<br>'+
-                    air_source.response[i].flight_icao+'<br>'+
-                    air_source.response[i].dep_iata+' to '+air_source.response[i].arr_iata+'<br>'))
-         .addTo(liveplane)
-        //console.log("if true:",air_source[0].response[i].hex)
-
-        //add shadow for each plane only when sun is up
-        var shaodowpoint =( shadowcalcPoint(air_source.response[i].updated,air_source.response[i].lat,air_source.response[i].lng,air_source.response[i].alt))
-        if(sunnow.altitude> 0){
-        L.rotatedMarker([shaodowpoint[0],shaodowpoint[1]],{icon: planeicon,rotationAngle: air_source.response[i].dir, opacity:50}).addTo(liveplane)};
-
+       
         liveplane.clearLayers()    
+        
         planeDraw(air_source)
-
         console.log(air_source.response[i].flight_icao,rnwDetect(air_source.response[i].lat,air_source.response[i].lng))
         //i need to find a way to get it out of this for loop
         
@@ -347,8 +341,8 @@ for (i in air_source.response){
 
 
 
-}//end the if
-else(console.log('no planes landing'))
+//end the if
+
 }//ends the for
 var output = document.getElementById("apiCallsLeft");
         output.innerHTML =  air_source.request.key.limits_total; // how many api calls left for mounth
