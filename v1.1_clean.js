@@ -77,7 +77,7 @@ var blueplane = L.icon({
 })
 
 
-//console.log( frData())
+console.log( frData())
 
 //fuction takes a point and a geojson of a buffer and retuns true if within
 function within(lat,lon,geojson){
