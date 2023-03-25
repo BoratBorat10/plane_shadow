@@ -77,7 +77,7 @@ var blueplane = L.icon({
 })
 
 
-console.log( frData())
+//console.log( frData())
 
 //fuction takes a point and a geojson of a buffer and retuns true if within
 function within(lat,lon,geojson){
@@ -253,6 +253,14 @@ for (i in buffer){
     //else{return "not in"}
 }} 
 
+var unix =  new Date(1626153069)
+var nowtest = Date.now()
+var timedif = (nowtest-1675702443)
+console.log(nowtest-1675702443)
+console.log('unix:',unix.setTime)
+console.log ('now',nowtest)
+console.log('dif', timedif)
+
 
 
 function planeDraw(airlab){
@@ -262,12 +270,13 @@ var lat = plane.lat
 var lon = plane.lng
 var t =0
 var updateTime = airlab.response[i].updated
+console.log(updateTime.toString)
 var planeMarker = L.rotatedMarker([lat,lon],{icon: planeicon,
     rotationAngle: plane.dir}).bindPopup(
                     (airlab.response[i].hex+'<br>'+
                     airlab.response[i].flight_icao+'<br>'+
                     airlab.response[i].dep_iata+' to '+airlab.response[i].arr_iata+'<br>'+
-                    updateTime.toString()))
+                    Date(airlab.response[i].updated)))
 
 
 var shadowMarker = L.rotatedMarker([lat,lon],{icon: planeicon,rotationAngle: airlab.response[i].dir, opacity:0.3}).bindPopup(airlab.response[i].flight_icao + ' shadow');
