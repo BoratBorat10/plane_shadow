@@ -261,11 +261,13 @@ airlab.response.forEach((plane,i)=>{
 var lat = plane.lat
 var lon = plane.lng
 var t =0
+var updateTime = airlab.response[i].updated
 var planeMarker = L.rotatedMarker([lat,lon],{icon: planeicon,
     rotationAngle: plane.dir}).bindPopup(
                     (airlab.response[i].hex+'<br>'+
                     airlab.response[i].flight_icao+'<br>'+
-                    airlab.response[i].dep_iata+' to '+airlab.response[i].arr_iata+'<br>'))
+                    airlab.response[i].dep_iata+' to '+airlab.response[i].arr_iata+'<br>'+
+                    updateTime.toString()))
 
 
 var shadowMarker = L.rotatedMarker([lat,lon],{icon: planeicon,rotationAngle: airlab.response[i].dir, opacity:0.3}).bindPopup(airlab.response[i].flight_icao + ' shadow');
@@ -279,7 +281,7 @@ setInterval(function(){
     
     //setTimeout(() => {liveplane.clearLayers()}, 910);
    
-    var speed = (plane.speed/(3.6/2)) //to get meter per second
+    var speed = (plane.speed/(3.6*2)) //to get meter per second
     var start = new LatLon(lat,lon).destinationPoint(speed*t, plane.dir)
     planeMarker.setLatLng([start._lat,start._lon])
 
