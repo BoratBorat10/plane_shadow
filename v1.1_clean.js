@@ -4,6 +4,7 @@ import * as track from './node_modules/geo_track.js'
 import * as airlab from './airlab.js';
 import * as buffer from './objects/buffers.js';
 import * as object from './objects/areas.js';
+//import { frData} from './fr_data.js';
 
 
 var map = L.map('map',{
@@ -86,10 +87,6 @@ function within(lat,lon,geojson){
 }
 
 
-//fr data test
-for (var i in airlab.flightRadar[0] ){
-//console.log(airlab.flightRadar[0][i][13])
-}
 
 var shadow_ar = [] //create empty array for shadows;
 
@@ -249,8 +246,6 @@ for (i in buffer){
     //else{return "not in"}
 }} 
 
-//var air_source= airlab.airlab
-console.log(airlab.airlab[0].response[1].speed)
 
 
 function planeDraw(airlab){
@@ -260,7 +255,16 @@ var lat = plane.lat
 var lon = plane.lng
 var t =0
 var planeMarker = L.rotatedMarker([lat,lon],{icon: planeicon,
-    rotationAngle: plane.dir}).bindPopup(plane.hex)
+    rotationAngle: plane.dir}).bindPopup(
+                    (airlab.response[i].hex+'<br>'+
+                    airlab.response[i].flight_icao+'<br>'+
+                    airlab.response[i].dep_iata+' to '+airlab.response[i].arr_iata+'<br>'))
+
+
+var shadowMarker = L.rotatedMarker([lat,lon],{icon: planeicon,rotationAngle: airlab.response[i].dir, opacity:0.3}).bindPopup('shadow');
+
+
+
 
 
 setInterval(function(){
@@ -269,16 +273,29 @@ setInterval(function(){
     //setTimeout(() => {liveplane.clearLayers()}, 910);
    
     var speed = plane.speed/3.6 //to get meter per second
-    console.log(speed)
     var start = new LatLon(lat,lon).destinationPoint(speed*t, plane.dir)
     planeMarker.setLatLng([start._lat,start._lon])
+
+
+    var shaodowpoint =(shadowcalcPoint(airlab.response[i].updated,start._lat,start._lon,airlab.response[i].alt))
+    shadowMarker.setLatLng([shaodowpoint[0],shaodowpoint[1]])
+
+
+
+    
+    
 
 
 
    
 
 },1000);
+
+
+//if ((airlab.response[i].arr_icao =='LLBG' && airlab.response[i].alt > 0 )){planeMarker.addTo(liveplane)}
 planeMarker.addTo(liveplane)
+shadowMarker.addTo(map)
+
 })
 
 
@@ -286,36 +303,6 @@ planeMarker.addTo(liveplane)
 
 
 
-/*
-
-airlab.airlab[0].response.forEach((plane,i)=>{ 
-    //liveplane.clearLayers();
-    console.log(plane.lat)
-    let t =0
-    var lat = plane.lat
-    var lng = plane.lng
-    console.log(lat,lng)
-    var planeMarker = L.rotatedMarker([lat,lng],{icon: planeicon,
-        rotationAngle: plane.dir}).bindPopup(plane.hex)
-
-    //i understood the probem: the for loop clears the layer everytime but only one plnae is added each loop
-    setInterval(function(){
-        t ++ 
-        
-        
-       
-
-        var start = new LatLon(lat,lng).destinationPoint(41*t, plane.dir)
-       
-
-        planeMarker.setLatLng([start._lat,start._lon])
-       //liveplane.clearLayers();
-       
-       
-    
-    },500);
-    planeMarker.addTo(liveplane)})
-*/
 
 //every time fetch api button is pressed- this is to minimize api calls
 document.getElementById('fetchbutton').onclick= async function(){
@@ -369,7 +356,7 @@ var output = document.getElementById("apiCallsLeft");
 }// ends onclick function
 
 
-//test marker
+/* //test marker
 var lat = 32.1 
 var lan = 34.8
 var markerT = L.marker([lat,lan])
@@ -381,10 +368,8 @@ setInterval((function(){
     lat = lat +0.0001
     lan = lan +0.0001
     markerT.setLatLng([lat,lan])
-    
-
-
 }),500)
+*/
 
 //GPS button- get location
 var gpsLayer = L.layerGroup().addTo(map);
