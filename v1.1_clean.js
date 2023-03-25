@@ -4,7 +4,7 @@ import * as track from './node_modules/geo_track.js'
 import * as airlab from './airlab.js';
 import * as buffer from './objects/buffers.js';
 import * as object from './objects/areas.js';
-//import { frData} from './fr_data.js';
+import { frData} from './fr_data.js';
 
 
 var map = L.map('map',{
@@ -76,6 +76,8 @@ var blueplane = L.icon({
     iconAnchor: [12,12]
 })
 
+
+//console.log( frData())
 
 //fuction takes a point and a geojson of a buffer and retuns true if within
 function within(lat,lon,geojson){
