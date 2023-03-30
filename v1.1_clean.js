@@ -38,6 +38,7 @@ var layerControl = L.control.layers(null, pointline).addTo(map);
 var pointline = L.layerGroup()
 layerControl.addOverlay(pointline, "Point Connect");
 
+//layer for now line
 var nowline = L.layerGroup()
 layerControl.addOverlay(nowline, "Now Line");
 map.addLayer(nowline)// on by defult
@@ -104,10 +105,6 @@ const sunnow = SunCalc.getPosition(date,32.068056, 34.769150)
 console.log(date)
 
 var  sliderdate = new Date(date)
-
-
-
-  
 
 
 
@@ -253,15 +250,22 @@ for (i in buffer){
     //else{return "not in"}
 }} 
 
-var unix =  new Date(1626153069)
-var nowtest = Date.now()
-var timedif = (nowtest-1675702443)
-console.log(nowtest-1675702443)
-console.log('unix:',unix.setTime)
-console.log ('now',nowtest)
+var updatetime = 1626153069
+var unix =  new Date(updatetime * 1000)
+var nowtest = new Date(1626153000000)
+
+var timedif = ((unix-nowtest))/1000
+console.log('unix:',unix.toLocaleTimeString())
+console.log ('now',)
 console.log('dif', timedif)
 
+function timeDiff(airlab){
+var update = new Date(airlab.response[i].updated*1000)
+var now = Date.now()
+var diff = (now-update)/1000 //in seconds
+return Math.floor(diff)
 
+}
 
 function planeDraw(airlab){
 
@@ -270,13 +274,12 @@ var lat = plane.lat
 var lon = plane.lng
 var t =0
 var updateTime = airlab.response[i].updated
-console.log(updateTime.toString)
 var planeMarker = L.rotatedMarker([lat,lon],{icon: planeicon,
     rotationAngle: plane.dir}).bindPopup(
                     (airlab.response[i].hex+'<br>'+
                     airlab.response[i].flight_icao+'<br>'+
                     airlab.response[i].dep_iata+' to '+airlab.response[i].arr_iata+'<br>'+
-                    Date(airlab.response[i].updated)))
+                    timeDiff(airlab)+ ' seconds ago'))
 
 
 var shadowMarker = L.rotatedMarker([lat,lon],{icon: planeicon,rotationAngle: airlab.response[i].dir, opacity:0.3}).bindPopup(airlab.response[i].flight_icao + ' shadow');
@@ -299,14 +302,6 @@ setInterval(function(){
     shadowMarker.setLatLng([shaodowpoint[0],shaodowpoint[1]])
 
 
-
-    
-    
-
-
-
-   
-
 },500);
 
 
@@ -319,7 +314,7 @@ shadowMarker.addTo(liveplane)}
 })
 
 
-}// plane draw function
+}//closes plane draw function
 
 
 
@@ -328,6 +323,7 @@ shadowMarker.addTo(liveplane)}
 document.getElementById('fetchbutton').onclick= async function(){
 
 //api_key=02615d93-395d-4ad0-883e-b99d81c413ba
+var newData = true
 fetch('https://airlabs.co/api/v9/flights?api_key=02615d93-395d-4ad0-883e-b99d81c413ba&bbox=29.563,33.760,33.321,36.002')
 .then((response) => response.json())
 .then((air_source) => {
@@ -338,10 +334,7 @@ fetch('https://airlabs.co/api/v9/flights?api_key=02615d93-395d-4ad0-883e-b99d81c
     liveplane.clearLayers();
 for (i in air_source.response){
     //if the arrival airport is LLBG and the alt is not 0 (ie. not on the gound)
-  
-    
         
-      
        
         liveplane.clearLayers()    
         
@@ -363,20 +356,6 @@ var output = document.getElementById("apiCallsLeft");
 }// ends onclick function
 
 
-/* //test marker
-var lat = 32.1 
-var lan = 34.8
-var markerT = L.marker([lat,lan])
-
-markerT.addTo(liveplane)
-
-setInterval((function(){
-    //liveplane.clearLayers()
-    lat = lat +0.0001
-    lan = lan +0.0001
-    markerT.setLatLng([lat,lan])
-}),500)
-*/
 
 //GPS button- get location
 var gpsLayer = L.layerGroup().addTo(map);
