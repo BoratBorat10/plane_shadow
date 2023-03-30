@@ -250,17 +250,9 @@ for (i in buffer){
     //else{return "not in"}
 }} 
 
-var updatetime = 1626153069
-var unix =  new Date(updatetime * 1000)
-var nowtest = new Date(1626153000000)
-
-var timedif = ((unix-nowtest))/1000
-console.log('unix:',unix.toLocaleTimeString())
-console.log ('now',)
-console.log('dif', timedif)
 
 function timeDiff(airlab){
-var update = new Date(airlab.response[i].updated*1000)
+var update = new Date(airlab.response[i].updated*1000)//seconds to milliseconds
 var now = Date.now()
 var diff = (now-update)/1000 //in seconds
 return Math.floor(diff)
@@ -274,12 +266,14 @@ var lat = plane.lat
 var lon = plane.lng
 var t =0
 var updateTime = airlab.response[i].updated
+var popup = L.popup({content: airlab.response[i].hex+'<br>'+
+airlab.response[i].flight_icao+'<br>'+
+airlab.response[i].dep_iata+' to '+airlab.response[i].arr_iata+'<br>'+
+timeDiff(airlab)+ ' seconds ago'+'<br>'+
+updateTime})
+
 var planeMarker = L.rotatedMarker([lat,lon],{icon: planeicon,
-    rotationAngle: plane.dir}).bindPopup(
-                    (airlab.response[i].hex+'<br>'+
-                    airlab.response[i].flight_icao+'<br>'+
-                    airlab.response[i].dep_iata+' to '+airlab.response[i].arr_iata+'<br>'+
-                    timeDiff(airlab)+ ' seconds ago'))
+    rotationAngle: plane.dir}).bindPopup(popup)
 
 
 var shadowMarker = L.rotatedMarker([lat,lon],{icon: planeicon,rotationAngle: airlab.response[i].dir, opacity:0.3}).bindPopup(airlab.response[i].flight_icao + ' shadow');
@@ -298,8 +292,10 @@ setInterval(function(){
     planeMarker.setLatLng([start._lat,start._lon])
 
 
-    var shaodowpoint =(shadowcalcPoint(airlab.response[i].updated,start._lat,start._lon,airlab.response[i].alt))
+    var shaodowpoint =(shadowcalcPoint(Date.now(),start._lat,start._lon,airlab.response[i].alt))
     shadowMarker.setLatLng([shaodowpoint[0],shaodowpoint[1]])
+    updateTime ++
+    popup.setContent(airlab.response[i].flight_icao)
 
 
 },500);
@@ -316,14 +312,18 @@ shadowMarker.addTo(liveplane)}
 
 }//closes plane draw function
 
-
-
+L.marker([32.1,34.5]).addTo(map)
+var shadowmark = shadowcalcPoint(Date.now(),32.1,34.5,200)
+console.log(shadowmark[0])
+L.marker([shadowmark[0],shadowmark[1]]).addTo(map)
 
 //every time fetch api button is pressed- this is to minimize api calls
 document.getElementById('fetchbutton').onclick= async function(){
 
 //api_key=02615d93-395d-4ad0-883e-b99d81c413ba
-var newData = true
+var newData
+console.log(newData)
+if(newData != false){
 fetch('https://airlabs.co/api/v9/flights?api_key=02615d93-395d-4ad0-883e-b99d81c413ba&bbox=29.563,33.760,33.321,36.002')
 .then((response) => response.json())
 .then((air_source) => {
@@ -343,7 +343,8 @@ for (i in air_source.response){
         //i need to find a way to get it out of this for loop
         
         
-
+newData = false
+console.log(newData)
 
 
 
@@ -353,6 +354,8 @@ for (i in air_source.response){
 var output = document.getElementById("apiCallsLeft");
         output.innerHTML =  air_source.request.key.limits_total; // how many api calls left for mounth
 })//ends the fetch async
+}//end if data= true
+else{alert('no new data')}
 }// ends onclick function
 
 
