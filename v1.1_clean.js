@@ -320,11 +320,15 @@ L.marker([shadowmark[0],shadowmark[1]]).addTo(map)
 //every time fetch api button is pressed- this is to minimize api calls
 document.getElementById('fetchbutton').onclick= async function(){
 
-//api_key=02615d93-395d-4ad0-883e-b99d81c413ba
+
+var dataSite = ('./objects/flights.json')
+//var dataSite = ('https://airlabs.co/api/v9/flights?api_key=02615d93-395d-4ad0-883e-b99d81c413ba&bbox=29.563,33.760,33.321,36.002')
+
+    //api_key=02615d93-395d-4ad0-883e-b99d81c413ba
 var newData
 console.log(newData)
 if(newData != false){
-fetch('https://airlabs.co/api/v9/flights?api_key=02615d93-395d-4ad0-883e-b99d81c413ba&bbox=29.563,33.760,33.321,36.002')
+fetch(dataSite)
 .then((response) => response.json())
 .then((air_source) => {
 
