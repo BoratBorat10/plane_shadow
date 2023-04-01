@@ -242,13 +242,46 @@ document.getElementById('nowbutton').onclick =function(date){
 }
 //runway decte takes a lat lon, and for the 3 buffer checks if within
 function rnwDetect(lat,lon){
+
 for (i in buffer){
     //32.061996,34.77475
     if(within(lat,lon,buffer[i])){
+    
         return buffer[i][0].name//reterun name of active runway
     }
-    //else{return "not in"}
+  
 }} 
+
+console.log(buffer.buffer21[0].limits.dirmax)
+
+function activeRnw(airlab){
+    var runwyaAR = []
+    const counts = {} 
+    airlab.response.forEach((plane)=>{
+
+
+        for (i in buffer){
+            
+            //32.061996,34.77475
+            if(within(plane.lat,plane.lng,buffer[i]) &&
+                plane.alt < buffer[i][0].limits.altmax){
+                    console.log(buffer[i][0].name)
+                runwyaAR.push([plane.flight_icao, buffer[i][0].name ])
+            }
+            
+          
+        }
+
+        
+        if(plane.alt < 2000 && plane.dir < 210){
+        runwyaAR.push([plane.flight_icao, rnwDetect(plane.lat,plane.lng)])
+        //airlab.response.push({'rnwy':rnwDetect(plane.lat,plane.lng)})
+
+
+        }//closes if
+    })
+    return runwyaAR
+}
 
 
 function timeDiff(airlab){
@@ -265,12 +298,12 @@ airlab.response.forEach((plane,i)=>{
 var lat = plane.lat
 var lon = plane.lng
 var t =0
-var updateTime = airlab.response[i].updated
-var popup = L.popup({content: airlab.response[i].hex+'<br>'+
-airlab.response[i].flight_icao+'<br>'+
+//var updateTime = timeDiff(airlab)
+var popup = L.popup({content: plane.hex+'<br>'+
+plane.flight_icao+'<br>'+
 airlab.response[i].dep_iata+' to '+airlab.response[i].arr_iata+'<br>'+
-timeDiff(airlab)+ ' seconds ago'+'<br>'+
-updateTime})
+rnwDetect(lat,lon)+ '<br>'})
+
 
 var planeMarker = L.rotatedMarker([lat,lon],{icon: planeicon,
     rotationAngle: plane.dir}).bindPopup(popup)
@@ -294,46 +327,59 @@ setInterval(function(){
 
     var shaodowpoint =(shadowcalcPoint(Date.now(),start._lat,start._lon,airlab.response[i].alt))
     shadowMarker.setLatLng([shaodowpoint[0],shaodowpoint[1]])
-    updateTime ++
-    popup.setContent(airlab.response[i].flight_icao)
+    //popup.setContent( lat)
 
 
 },500);
 
 
-//if ((airlab.response[i].arr_icao =='LLBG' && airlab.response[i].alt > 0 )){planeMarker.addTo(liveplane)}
-if( airlab.response[i].alt > 1){
-planeMarker.addTo(liveplane)
-shadowMarker.addTo(liveplane)}
-
+if( airlab.response[i].alt > 1){planeMarker.addTo(liveplane)}; //if plane off the gound
+if(sunnow.altitude > 0){shadowMarker.addTo(liveplane)}; // if the sun is up
 
 })
 
 
 }//closes plane draw function
 
-L.marker([32.1,34.5]).addTo(map)
-var shadowmark = shadowcalcPoint(Date.now(),32.1,34.5,200)
-console.log(shadowmark[0])
-L.marker([shadowmark[0],shadowmark[1]]).addTo(map)
+
+
+var newData = true
+var updateTime = null
 
 //every time fetch api button is pressed- this is to minimize api calls
 document.getElementById('fetchbutton').onclick= async function(){
 
 
-var dataSite = ('./objects/flights.json')
-//var dataSite = ('https://airlabs.co/api/v9/flights?api_key=02615d93-395d-4ad0-883e-b99d81c413ba&bbox=29.563,33.760,33.321,36.002')
+//var dataSite = ('./objects/flights.json')
+var dataSite = ('https://airlabs.co/api/v9/flights?api_key=02615d93-395d-4ad0-883e-b99d81c413ba&bbox=29.563,33.760,33.321,36.002')
 
     //api_key=02615d93-395d-4ad0-883e-b99d81c413ba
-var newData
+
 console.log(newData)
-if(newData != false){
+
 fetch(dataSite)
 .then((response) => response.json())
 .then((air_source) => {
 
     console.log(air_source)
+    sessionStorage.setItem('air_source',JSON.stringify(air_source))
+    console.log(activeRnw(air_source))
 
+    console.log(
+    JSON.parse(sessionStorage.getItem('air_source'))[0]
+    )
+
+
+    if(updateTime == null){
+    updateTime = air_source.response[0].updated}
+    else{
+        if(updateTime == air_source.response[0].updated){
+            newData = false
+        }
+    }
+        console.log(newData)
+
+    if(newData == true){
 
     liveplane.clearLayers();
 for (i in air_source.response){
@@ -341,25 +387,16 @@ for (i in air_source.response){
         
        
         liveplane.clearLayers()    
-        
         planeDraw(air_source)
-        console.log(air_source.response[i].flight_icao,rnwDetect(air_source.response[i].lat,air_source.response[i].lng))
-        //i need to find a way to get it out of this for loop
-        
-        
-newData = false
-console.log(newData)
-
-
-
-//end the if
+       
 
 }//ends the for
+}// if newData = true
+else{console.log('No New Data')}
+
 var output = document.getElementById("apiCallsLeft");
         output.innerHTML =  air_source.request.key.limits_total; // how many api calls left for mounth
 })//ends the fetch async
-}//end if data= true
-else{alert('no new data')}
 }// ends onclick function
 
 
