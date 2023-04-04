@@ -5,6 +5,7 @@ import * as airlab from './airlab.js';
 import * as buffer from './objects/buffers.js';
 import * as object from './objects/areas.js';
 import { frData} from './fr_data.js';
+import "https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js";
 
 
 var map = L.map('map',{
@@ -314,7 +315,7 @@ var shadowMarker = L.rotatedMarker([lat,lon],{icon: planeicon,rotationAngle: air
 
 
 
-
+var shadowLocationAr = []
 
 setInterval(function(){
     t ++ 
@@ -328,6 +329,7 @@ setInterval(function(){
 
     var shaodowpoint =(shadowcalcPoint(Date.now(),start._lat,start._lon,airlab.response[i].alt))
     shadowMarker.setLatLng([shaodowpoint[0],shaodowpoint[1]])
+    //shadowLocationAr.push([plane.hex,shaodowpoint[0],shaodowpoint[1]])
     //popup.setContent( lat)
 
 
@@ -335,7 +337,7 @@ setInterval(function(){
 
 
 if( airlab.response[i].alt > 1){planeMarker.addTo(liveplane)}; //if plane off the gound
-if(sunnow.altitude > 0){shadowMarker.addTo(liveplane)}; // if the sun is up
+if(sunnow.altitude > 0 && airlab.response[i].alt){shadowMarker.addTo(liveplane)}; // if the sun is up
 
 })
 
@@ -351,8 +353,8 @@ var updateTime = null
 document.getElementById('fetchbutton').onclick= async function(){
 
 
-//var dataSite = ('./objects/flights.json')
-var dataSite = ('https://airlabs.co/api/v9/flights?api_key=02615d93-395d-4ad0-883e-b99d81c413ba&bbox=29.563,33.760,33.321,36.002')
+var dataSite = ('./objects/flights.json')
+//var dataSite = ('https://airlabs.co/api/v9/flights?api_key=02615d93-395d-4ad0-883e-b99d81c413ba&bbox=29.563,33.760,33.321,36.002')
 
     //api_key=02615d93-395d-4ad0-883e-b99d81c413ba
 
@@ -412,15 +414,21 @@ document.getElementById('posButton').onclick= function(){
     const successCallback = (position) => {
     gpsLayer.clearLayers();
     
-    var gpslat = position.coords.latitude
-   var gpslon = position.coords.longitude
+    //var gpslat = position.coords.latitude
+    //var gpslon = position.coords.longitude
         //testing on rambam
-    //var gpslat = 32.0701889
-    //var gpslon = 34.7726968
+    var gpslat = 32.0701889
+    var gpslon = 34.7726968
 
     L.marker([gpslat,gpslon]).addTo(gpsLayer);
     L.circle([gpslat,gpslon],{radius:position.coords.accuracy}).addTo(gpsLayer);
     map.flyTo([gpslat,gpslon],18); //turned of for testing
+
+
+
+    var targetPoint = turf.point([gpslat,gpslon])
+    console.log(targetPoint)
+
     
   };
   
@@ -429,15 +437,28 @@ document.getElementById('posButton').onclick= function(){
   };
   
   navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
+
+
+  
+
+
+
+
+
 }
 
 //ATIS audio button
 const atis = new Audio('./recordings/edds-atis-77073.mp3');
 document.getElementById('atisButton').onclick= function(){
-atis.play()
 
+if (atis.paused){atis.play()}
+else {atis.pause();
+        atis.currentTime = 0// stars form the beging insead of just pauseing.
+    }
 
+//atis.play()
 }
+document.getElementById('atisButton').addEventListener('click',console.log('audio click'))
 
 /*
 -----time test-----.
