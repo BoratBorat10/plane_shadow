@@ -414,7 +414,7 @@ fetch(dataSite)
 
     console.log(air_source)
     sessionStorage.setItem('air_source',JSON.stringify(air_source))
-    console.log(activeRnw(air_source))
+    console.log(updateTime)
 
     
 
@@ -424,6 +424,7 @@ fetch(dataSite)
     else{
         if(updateTime == air_source.response[0].updated){
             newData = false
+            console.log("No new Data- did not refresh")
         }
     }
         console.log(newData)
