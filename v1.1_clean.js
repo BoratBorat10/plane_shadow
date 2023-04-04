@@ -285,12 +285,13 @@ function activeRnw(airlab){
 
 
 function timeDiff(airlab){
-var update = new Date(airlab.response[i].updated*1000)//seconds to milliseconds
+var update = new Date(airlab.response[0].updated*1000)//seconds to milliseconds
 var now = Date.now()
 var diff = (now-update)/1000 //in seconds
 return Math.floor(diff)
 
 }
+
 
 function planeDraw(airlab){
 
@@ -392,10 +393,13 @@ for (i in air_source.response){
 
 }//ends the for
 }// if newData = true
-else{console.log('No New Data')}
+else{document.getElementById('updateTime').innerHTML = "teset"}
 
 var output = document.getElementById("apiCallsLeft");
         output.innerHTML =  air_source.request.key.limits_total; // how many api calls left for mounth
+
+        document.getElementById('updateTime').innerHTML = timeDiff(air_source);
+        console.log(timeDiff(air_source))
 })//ends the fetch async
 }// ends onclick function
 
