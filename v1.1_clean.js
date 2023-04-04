@@ -108,6 +108,16 @@ console.log(date)
 var  sliderdate = new Date(date)
 
 
+//functions for max
+function getMaxOfArray(numArray) {
+    return Math.max.apply(null, numArray);
+  }
+
+  function getObjectKey(obj, value) {
+    return Object.keys(obj).find(key => obj[key] === value);
+    }
+
+
 
 //chnages the date with the slider
 document.getElementById('slider').addEventListener('input', function (){
@@ -275,7 +285,7 @@ function activeRnw(airlab){
                     {
                     console.log(plane.flight_icao, buffer[i][0].name);
                     runwyaAR.push(buffer[i][0].name);
-                    counts[buffer[i][0].name] =+ 1
+                    counts[buffer[i][0].name] += 1
             }
             
           
@@ -291,8 +301,34 @@ function activeRnw(airlab){
         }//closes if
     })
     var countsAr =Object.values(counts)
-    console.log(getMaxofArray(countsAr))
-    return runwyaAR
+    /*
+    --What Happens:--
+
+    -counts it this object: {'Runway 12':0,'Runway 20':0,'Runway 30':0}
+    -the runway detection adds a 1 every time a it dectects a plane on the relvent rnwy.
+    - countsAE is an array of the final values; [0,1,3]
+        -ie: 0 planes in Rnw 12, 1 planein Rnw 20, 3 planes in Rnw 30
+    -getMaxOfArray reterst the number 3
+    -getObject key reters its inderx in the array: 2
+    -object.keys(counts) creates an array of the keys: the rnwy names
+    -the numer 2 is then inseteretin it that array of keys to return: Runway 30
+
+
+    console.log(counts)
+    console.log(getMaxOfArray(countsAr)) // the num 3
+    console.log(getObjectKey(countsAr,getMaxOfArray(countsAr))) // 2 position
+    console.log(Object.keys(counts)[getObjectKey(countsAr,getMaxOfArray(countsAr))])//runway 30
+    */
+    
+    return Object.keys(counts)[getObjectKey(countsAr,getMaxOfArray(Object.values(counts)))]
+
+    
+
+
+    
+
+
+
 }
 
 
@@ -365,8 +401,8 @@ var updateTime = null
 document.getElementById('fetchbutton').onclick= async function(){
 
 
-var dataSite = ('./objects/flights.json')
-//var dataSite = ('https://airlabs.co/api/v9/flights?api_key=02615d93-395d-4ad0-883e-b99d81c413ba&bbox=29.563,33.760,33.321,36.002')
+//var dataSite = ('./objects/flights.json')
+var dataSite = ('https://airlabs.co/api/v9/flights?api_key=02615d93-395d-4ad0-883e-b99d81c413ba&bbox=29.563,33.760,33.321,36.002')
 
     //api_key=02615d93-395d-4ad0-883e-b99d81c413ba
 
@@ -407,11 +443,11 @@ for (i in air_source.response){
 }// if newData = true
 else{document.getElementById('updateTime').innerHTML = "teset"}
 
-var output = document.getElementById("apiCallsLeft");
-        output.innerHTML =  air_source.request.key.limits_total; // how many api calls left for mounth
+        document.getElementById("apiCallsLeft").innerHTML =  air_source.request.key.limits_total; // how many api calls left for mounth
 
         document.getElementById('updateTime').innerHTML = timeDiff(air_source);
-        console.log(timeDiff(air_source))
+        
+        document.getElementById('activeRnw').innerHTML = activeRnw(air_source);
 })//ends the fetch async
 }// ends onclick function
 
