@@ -422,9 +422,11 @@ fetch(dataSite)
     if(updateTime == null){
     updateTime = air_source.response[0].updated}
     else{
-        if(updateTime == air_source.response[0].updated){
+        if(updateTime == air_source.response[0].updated || null ){
             newData = false
             console.log("No new Data- did not refresh")
+            console.log(updateTime)
+            console.log(air_source.response[0].updated)
         }
     }
         console.log(newData)
