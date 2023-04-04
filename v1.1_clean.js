@@ -5,6 +5,7 @@ import * as airlab from './airlab.js';
 import * as buffer from './objects/buffers.js';
 import * as object from './objects/areas.js';
 import { frData} from './fr_data.js';
+import "https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js";
 
 
 var map = L.map('map',{
@@ -38,6 +39,7 @@ var layerControl = L.control.layers(null, pointline).addTo(map);
 var pointline = L.layerGroup()
 layerControl.addOverlay(pointline, "Point Connect");
 
+//layer for now line
 var nowline = L.layerGroup()
 layerControl.addOverlay(nowline, "Now Line");
 map.addLayer(nowline)// on by defult
@@ -106,8 +108,14 @@ console.log(date)
 var  sliderdate = new Date(date)
 
 
+//functions for max
+function getMaxOfArray(numArray) {
+    return Math.max.apply(null, numArray);
+  }
 
-  
+  function getObjectKey(obj, value) {
+    return Object.keys(obj).find(key => obj[key] === value);
+    }
 
 
 
@@ -244,23 +252,94 @@ document.getElementById('nowbutton').onclick =function(date){
     
 }
 //runway decte takes a lat lon, and for the 3 buffer checks if within
-function rnwDetect(lat,lon){
+function rnwDetect(plane){
+
 for (i in buffer){
     //32.061996,34.77475
-    if(within(lat,lon,buffer[i])){
+    if(within(plane.lat,plane.lng,buffer[i]) &&
+    plane.alt < buffer[i][0].limits.altmax &&
+    plane.alt > buffer[i][0].limits.altmin &&
+    plane.dir >buffer[i][0].limits.dirmin &&
+    plane.dir < buffer[i][0].limits.dirmax ){
+    
         return buffer[i][0].name//reterun name of active runway
     }
-    //else{return "not in"}
+  
 }} 
 
-var unix =  new Date(1626153069)
-var nowtest = Date.now()
-var timedif = (nowtest-1675702443)
-console.log(nowtest-1675702443)
-console.log('unix:',unix.setTime)
-console.log ('now',nowtest)
-console.log('dif', timedif)
+console.log(buffer.buffer21[0].limits.dirmax)
 
+function activeRnw(airlab){
+    var runwyaAR = []
+    var counts = {'Runway 12':0,'Runway 20':0,'Runway 30':0} 
+    airlab.response.forEach((plane)=>{
+
+
+        for (i in buffer){
+            //32.061996,34.77475
+            if(within(plane.lat,plane.lng,buffer[i]) &&
+                plane.alt < buffer[i][0].limits.altmax &&
+                plane.alt > buffer[i][0].limits.altmin &&
+                plane.dir >buffer[i][0].limits.dirmin &&
+                plane.dir < buffer[i][0].limits.dirmax )
+                    {
+                    console.log(plane.flight_icao, buffer[i][0].name);
+                    runwyaAR.push(buffer[i][0].name);
+                    counts[buffer[i][0].name] += 1
+            }
+            
+          
+        }
+
+
+        
+        if(plane.alt < 2000 && plane.dir < 210){
+        //runwyaAR.push([plane.flight_icao, rnwDetect(plane.lat,plane.lng)])
+        //airlab.response.push({'rnwy':rnwDetect(plane.lat,plane.lng)})
+
+
+        }//closes if
+    })
+    var countsAr =Object.values(counts)
+    /*
+    --What Happens:--
+
+    -counts it this object: {'Runway 12':0,'Runway 20':0,'Runway 30':0}
+    -the runway detection adds a 1 every time a it dectects a plane on the relvent rnwy.
+    - countsAE is an array of the final values; [0,1,3]
+        -ie: 0 planes in Rnw 12, 1 planein Rnw 20, 3 planes in Rnw 30
+    -getMaxOfArray reterst the number 3
+    -getObject key reters its inderx in the array: 2
+    -object.keys(counts) creates an array of the keys: the rnwy names
+    -the numer 2 is then inseteretin it that array of keys to return: Runway 30
+
+
+    console.log(counts)
+    console.log(getMaxOfArray(countsAr)) // the num 3
+    console.log(getObjectKey(countsAr,getMaxOfArray(countsAr))) // 2 position
+    console.log(Object.keys(counts)[getObjectKey(countsAr,getMaxOfArray(countsAr))])//runway 30
+    */
+    
+    return Object.keys(counts)[getObjectKey(countsAr,getMaxOfArray(Object.values(counts)))]
+
+    
+
+
+    
+
+
+
+}
+
+
+
+function timeDiff(airlab){
+var update = new Date(airlab.response[0].updated*1000)//seconds to milliseconds
+var now = Date.now()
+var diff = (now-update)/1000 //in seconds
+return Math.floor(diff)
+
+}
 
 
 function planeDraw(airlab){
@@ -269,21 +348,22 @@ airlab.response.forEach((plane,i)=>{
 var lat = plane.lat
 var lon = plane.lng
 var t =0
-var updateTime = airlab.response[i].updated
-console.log(updateTime.toString)
+//var updateTime = timeDiff(airlab)
+var popup = L.popup({content: plane.hex+'<br>'+
+plane.flight_icao+'<br>'+
+airlab.response[i].dep_iata+' to '+airlab.response[i].arr_iata+'<br>'+
+rnwDetect(plane)+ '<br>'})
+
+
 var planeMarker = L.rotatedMarker([lat,lon],{icon: planeicon,
-    rotationAngle: plane.dir}).bindPopup(
-                    (airlab.response[i].hex+'<br>'+
-                    airlab.response[i].flight_icao+'<br>'+
-                    airlab.response[i].dep_iata+' to '+airlab.response[i].arr_iata+'<br>'+
-                    Date(airlab.response[i].updated)))
+    rotationAngle: plane.dir}).bindPopup(popup)
 
 
 var shadowMarker = L.rotatedMarker([lat,lon],{icon: planeicon,rotationAngle: airlab.response[i].dir, opacity:0.3}).bindPopup(airlab.response[i].flight_icao + ' shadow');
 
 
 
-
+var shadowLocationAr = []
 
 setInterval(function(){
     t ++ 
@@ -295,88 +375,84 @@ setInterval(function(){
     planeMarker.setLatLng([start._lat,start._lon])
 
 
-    var shaodowpoint =(shadowcalcPoint(airlab.response[i].updated,start._lat,start._lon,airlab.response[i].alt))
+    var shaodowpoint =(shadowcalcPoint(Date.now(),start._lat,start._lon,airlab.response[i].alt))
     shadowMarker.setLatLng([shaodowpoint[0],shaodowpoint[1]])
+    //shadowLocationAr.push([plane.hex,shaodowpoint[0],shaodowpoint[1]])
+    //popup.setContent( lat)
 
-
-
-    
-    
-
-
-
-   
 
 },500);
 
 
-//if ((airlab.response[i].arr_icao =='LLBG' && airlab.response[i].alt > 0 )){planeMarker.addTo(liveplane)}
-if( airlab.response[i].alt > 1){
-planeMarker.addTo(liveplane)
-shadowMarker.addTo(liveplane)}
-
+if( airlab.response[i].alt > 1){planeMarker.addTo(liveplane)}; //if plane off the gound
+if(sunnow.altitude > 0 && airlab.response[i].alt){shadowMarker.addTo(liveplane)}; // if the sun is up
 
 })
 
 
-}// plane draw function
+}//closes plane draw function
 
 
 
+var newData = true
+var updateTime = null
 
 //every time fetch api button is pressed- this is to minimize api calls
 document.getElementById('fetchbutton').onclick= async function(){
 
-//api_key=02615d93-395d-4ad0-883e-b99d81c413ba
-fetch('https://airlabs.co/api/v9/flights?api_key=02615d93-395d-4ad0-883e-b99d81c413ba&bbox=29.563,33.760,33.321,36.002')
+
+//var dataSite = ('./objects/flights.json')
+var dataSite = ('https://airlabs.co/api/v9/flights?api_key=02615d93-395d-4ad0-883e-b99d81c413ba&bbox=29.563,33.760,33.321,36.002')
+
+    //api_key=02615d93-395d-4ad0-883e-b99d81c413ba
+
+console.log(newData)
+
+fetch(dataSite)
 .then((response) => response.json())
 .then((air_source) => {
 
     console.log(air_source)
+    sessionStorage.setItem('air_source',JSON.stringify(air_source))
+    console.log(updateTime)
 
+    
+
+
+    if(updateTime == null){
+    updateTime = air_source.response[0].updated}
+    else{
+        if(updateTime == air_source.response[0].updated){
+            newData = false
+            console.log("No new Data- did not refresh")
+        }
+    }
+        console.log(newData)
+
+    if(newData == true){
 
     liveplane.clearLayers();
 for (i in air_source.response){
     //if the arrival airport is LLBG and the alt is not 0 (ie. not on the gound)
-  
-    
         
-      
        
         liveplane.clearLayers()    
-        
         planeDraw(air_source)
-        console.log(air_source.response[i].flight_icao,rnwDetect(air_source.response[i].lat,air_source.response[i].lng))
-        //i need to find a way to get it out of this for loop
-        
-        
-
-
-
-
-//end the if
+       
 
 }//ends the for
-var output = document.getElementById("apiCallsLeft");
-        output.innerHTML =  air_source.request.key.limits_total; // how many api calls left for mounth
+}// if newData = true
+else{document.getElementById('updateTime').innerHTML = "teset"}
+
+        document.getElementById("apiCallsLeft").innerHTML =  air_source.request.key.limits_total; // how many api calls left for mounth
+
+        document.getElementById('updateTime').innerHTML = timeDiff(air_source);
+        
+        document.getElementById('activeRnw').innerHTML = activeRnw(air_source);
 })//ends the fetch async
 }// ends onclick function
 
 
-/* //test marker
-var lat = 32.1 
-var lan = 34.8
-var markerT = L.marker([lat,lan])
-
-markerT.addTo(liveplane)
-
-setInterval((function(){
-    //liveplane.clearLayers()
-    lat = lat +0.0001
-    lan = lan +0.0001
-    markerT.setLatLng([lat,lan])
-}),500)
-*/
 
 //GPS button- get location
 var gpsLayer = L.layerGroup().addTo(map);
@@ -385,15 +461,21 @@ document.getElementById('posButton').onclick= function(){
     const successCallback = (position) => {
     gpsLayer.clearLayers();
     
-    var gpslat = position.coords.latitude
-   var gpslon = position.coords.longitude
+    //var gpslat = position.coords.latitude
+    //var gpslon = position.coords.longitude
         //testing on rambam
-    //var gpslat = 32.0701889
-    //var gpslon = 34.7726968
+    var gpslat = 32.0701889
+    var gpslon = 34.7726968
 
     L.marker([gpslat,gpslon]).addTo(gpsLayer);
     L.circle([gpslat,gpslon],{radius:position.coords.accuracy}).addTo(gpsLayer);
     map.flyTo([gpslat,gpslon],18); //turned of for testing
+
+
+
+    var targetPoint = turf.point([gpslat,gpslon])
+    console.log(targetPoint)
+
     
   };
   
@@ -402,15 +484,28 @@ document.getElementById('posButton').onclick= function(){
   };
   
   navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
+
+
+  
+
+
+
+
+
 }
 
 //ATIS audio button
 const atis = new Audio('./recordings/edds-atis-77073.mp3');
 document.getElementById('atisButton').onclick= function(){
-atis.play()
 
+if (atis.paused){atis.play()}
+else {atis.pause();
+        atis.currentTime = 0// stars form the beging insead of just pauseing.
+    }
 
+//atis.play()
 }
+document.getElementById('atisButton').addEventListener('click',console.log('audio click'))
 
 /*
 -----time test-----.
