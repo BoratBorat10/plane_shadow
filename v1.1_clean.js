@@ -242,11 +242,15 @@ document.getElementById('nowbutton').onclick =function(date){
     
 }
 //runway decte takes a lat lon, and for the 3 buffer checks if within
-function rnwDetect(lat,lon){
+function rnwDetect(plane){
 
 for (i in buffer){
     //32.061996,34.77475
-    if(within(lat,lon,buffer[i])){
+    if(within(plane.lat,plane.lng,buffer[i]) &&
+    plane.alt < buffer[i][0].limits.altmax &&
+    plane.alt > buffer[i][0].limits.altmin &&
+    plane.dir >buffer[i][0].limits.dirmin &&
+    plane.dir < buffer[i][0].limits.dirmax ){
     
         return buffer[i][0].name//reterun name of active runway
     }
@@ -257,32 +261,40 @@ console.log(buffer.buffer21[0].limits.dirmax)
 
 function activeRnw(airlab){
     var runwyaAR = []
-    const counts = {} 
+    var counts = {'Runway 12':0,'Runway 20':0,'Runway 30':0} 
     airlab.response.forEach((plane)=>{
 
 
         for (i in buffer){
-            
             //32.061996,34.77475
             if(within(plane.lat,plane.lng,buffer[i]) &&
-                plane.alt < buffer[i][0].limits.altmax){
-                    console.log(buffer[i][0].name)
-                runwyaAR.push([plane.flight_icao, buffer[i][0].name ])
+                plane.alt < buffer[i][0].limits.altmax &&
+                plane.alt > buffer[i][0].limits.altmin &&
+                plane.dir >buffer[i][0].limits.dirmin &&
+                plane.dir < buffer[i][0].limits.dirmax )
+                    {
+                    console.log(plane.flight_icao, buffer[i][0].name);
+                    runwyaAR.push(buffer[i][0].name);
+                    counts[buffer[i][0].name] =+ 1
             }
             
           
         }
 
+
         
         if(plane.alt < 2000 && plane.dir < 210){
-        runwyaAR.push([plane.flight_icao, rnwDetect(plane.lat,plane.lng)])
+        //runwyaAR.push([plane.flight_icao, rnwDetect(plane.lat,plane.lng)])
         //airlab.response.push({'rnwy':rnwDetect(plane.lat,plane.lng)})
 
 
         }//closes if
     })
+    var countsAr =Object.values(counts)
+    console.log(getMaxofArray(countsAr))
     return runwyaAR
 }
+
 
 
 function timeDiff(airlab){
@@ -304,7 +316,7 @@ var t =0
 var popup = L.popup({content: plane.hex+'<br>'+
 plane.flight_icao+'<br>'+
 airlab.response[i].dep_iata+' to '+airlab.response[i].arr_iata+'<br>'+
-rnwDetect(lat,lon)+ '<br>'})
+rnwDetect(plane)+ '<br>'})
 
 
 var planeMarker = L.rotatedMarker([lat,lon],{icon: planeicon,
@@ -368,9 +380,7 @@ fetch(dataSite)
     sessionStorage.setItem('air_source',JSON.stringify(air_source))
     console.log(activeRnw(air_source))
 
-    console.log(
-    JSON.parse(sessionStorage.getItem('air_source'))[0]
-    )
+    
 
 
     if(updateTime == null){
