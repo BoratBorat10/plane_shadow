@@ -1,10 +1,10 @@
 # Airplane Shadow
+![GIF-2023-02-26-16-34-56](https://github.com/BoratBorat10/plane_shadow/assets/110756460/3e9ff217-9843-4ca7-90ae-b9cf18074ca8)
 
-![GIF-2023-02-26-16-34-56](C:\Users\Yaron\Documents\Plane Shadow docs\GIF-2023-02-26-16-34-56.gif)
 
 ## Overview
 
-For many living under the approach path for a busy international airport is a reason the demand lower rent. But for me it held a great opportunity. One day walking around the neighborhood i heard the now familiar noise of a airplane flying low for landing and a few seconds later i was enveloped for an instant in darkness. Before i could realize what had happened it had already passed. I could not believe it, it was the planes shadow!
+For many living under the approach path for a busy international airport is a reason the demand lower rent. But for me it held a great opportunity. One day walking around the neighborhood I heard the now familiar noise of a airplane flying low for landing and a few seconds later i was enveloped for an instant in darkness. Before i could realize what had happened it had already passed. I could not believe it, it was the planes shadow!
 
 I could not let this special experience be a one time occurrence. Being engulfed for an instant in the shadow of a 44 thousand ton beast flying above you was something that i had to experience again. But how? My mind raced. I quickly sketched up a diagram and realized that I only need a few key pieces of information to make it all work. I then set out to build a proof of conspent.
 
@@ -20,7 +20,7 @@ Live airplane information is retrieved via [Airlabs API](https://airlabs.co/docs
 
 With this information the of the location where the shadow will be cast is just some trigonometry and Geodesic calculations using the [Geodesy](https://www.movable-type.co.uk/scripts/geodesy-library.html) library,
 
-![Image](https://www.fs.usda.gov/nac/buffers/images/guide/5.6a.jpg)
+![image](https://github.com/BoratBorat10/plane_shadow/assets/110756460/8be7d680-cfaa-43b4-ae16-a21f344df3ff)
 
 
 
@@ -32,7 +32,7 @@ Loading the site on my phone I headed out to the beach, situated myself squarely
 
 And then...
 
-![GIF-2023-02-10-15-39-52- beach](C:\Users\Yaron\Documents\Plane Shadow docs\GIF-2023-02-10-15-39-52- beach.gif)
+![GIF-2023-02-10-15-39-52- beach](https://github.com/BoratBorat10/plane_shadow/assets/110756460/6674101e-b6b3-4803-8fd7-76227cb31a58)
 
 It works! We now have a reliable method of predicting when and where the shadow from the airplane will be cast. This opens up the opportunity to consistently experience this phenomenon, as well as being able to prepare in advance to capture it on camera.
 
@@ -52,7 +52,8 @@ This can be used to know at what times one can expect shadows above their home. 
 
 Clicking on a Airplane will bring up its flight information. Clicking on a shadow will display the name of the plane casting it. This is useful from crowded areads.
 
-![image-20240604161913128](C:\Users\Yaron\AppData\Roaming\Typora\typora-user-images\image-20240604161913128.png)
+![image](https://github.com/BoratBorat10/plane_shadow/assets/110756460/d294786c-b5fe-486e-97b9-c45da44718d8)
+
 
 ### Runway Detection
 
@@ -62,7 +63,7 @@ Using historical flight data I generated buffers using the [Shapely](https://sha
 
 Using [Turf.js](https://turfjs.org/), the program can now recognize if airplanes are contained inside the geographic buffer (and in addition they are at the correct height and heading) and figure out the which runway is now active for approaches. 
 
-![image-20240604162450452](C:\Users\Yaron\AppData\Roaming\Typora\typora-user-images\image-20240604162450452.png)
+![image](https://github.com/BoratBorat10/plane_shadow/assets/110756460/247cc19f-3e02-4b3a-b200-a72539bd3f70)
 
 ## Conclusion
 
