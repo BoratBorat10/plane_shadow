@@ -52,8 +52,8 @@ This can be used to know at what times one can expect shadows above their home. 
 
 Clicking on a Airplane will bring up its flight information. Clicking on a shadow will display the name of the plane casting it. This is useful from crowded areads.
 
-![image](https://github.com/BoratBorat10/plane_shadow/assets/110756460/d294786c-b5fe-486e-97b9-c45da44718d8)
 
+<img src="https://github.com/BoratBorat10/plane_shadow/assets/110756460/d294786c-b5fe-486e-97b9-c45da44718d8" alt="airplane info" width="400"/>
 
 ### Runway Detection
 
@@ -63,7 +63,7 @@ Using historical flight data I generated buffers using the [Shapely](https://sha
 
 Using [Turf.js](https://turfjs.org/), the program can now recognize if airplanes are contained inside the geographic buffer (and in addition they are at the correct height and heading) and figure out the which runway is now active for approaches. 
 
-![image](https://github.com/BoratBorat10/plane_shadow/assets/110756460/247cc19f-3e02-4b3a-b200-a72539bd3f70)
+<img src="https://github.com/BoratBorat10/plane_shadow/assets/110756460/247cc19f-3e02-4b3a-b200-a72539bd3f70" alt="rnwy" width="400"/>
 
 ## Conclusion
 
