@@ -6,55 +6,379 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shadow Map</title>
+
+    <!-- Leaflet -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
         integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI=" crossorigin="" />
     <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
         integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/suncalc/1.9.0/suncalc.js"></script>
     <script src="https://unpkg.com/@turf/turf@6/turf.min.js"></script>
-    <link rel="stylesheet" href="style.css">
 
+    <style>
+        :root {
+            --bg-main: #05070b;
+            --bg-panel: #0d1018;
+            --bg-panel-soft: #151826;
+            /* --accent: #4fd1c5; */
+            --accent: #b65cf1;
+            --accent-soft: rgba(79, 209, 197, 0.2);
+            --text-main: #f5f5f5;
+            --text-muted: #9ca3af;
+            --border-subtle: rgba(148, 163, 184, 0.35);
+            --danger: #f97373;
+        }
+
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: radial-gradient(circle at top, #111827 0, #020617 45%, #000 100%);
+            color: var(--text-main);
+            font-family: Consolas, "SF Mono", "Roboto Mono", Menlo, Monaco, monospace;
+            display: flex;
+            justify-content: center;
+        }
+
+        .app {
+            width: 100%;
+            max-width: 1200px;
+            padding: 12px 16px 4px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            box-sizing: border-box;
+        }
+
+
+
+
+        .top-row {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .title-block {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1.2rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            font-weight: 500;
+            color: var(--text-main);
+        }
+
+        .subtitle {
+            margin: 0;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+        }
+
+        .info-row {
+            margin-top: 8px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            background: linear-gradient(90deg, rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.3));
+            border: 1px solid var(--border-subtle);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            align-items: center;
+            font-size: 1rem;
+            white-space: nowrap;
+            overflow-x: auto;
+        }
+
+        .info-label {
+            color: var(--text-muted);
+            margin-right: 4px;
+        }
+
+        .info-value {
+            color: var(--accent);
+        }
+
+        /* Main layout */
+        .main {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .control-panel {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 2px 12px 6px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .slider-row {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .slider-label-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* Slider styling */
+        #slider {
+            width: 100%;
+            appearance: none;
+            height: 4px;
+            border-radius: 999px;
+            background: rgba(148, 163, 184, 0.4);
+            outline: none;
+        }
+
+        #slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--accent);
+            border: 2px solid #020617;
+            box-shadow: 0 0 0 4px var(--accent-soft);
+            cursor: pointer;
+            margin-top: -5px;
+        }
+
+        #slider::-moz-range-thumb {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--accent);
+            border: 2px solid #020617;
+            box-shadow: 0 0 0 4px var(--accent-soft);
+            cursor: pointer;
+        }
+
+        #slider::-moz-range-track {
+            height: 4px;
+            border-radius: 999px;
+            background: rgba(148, 163, 184, 0.4);
+        }
+
+        .secondary-info-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px 16px;
+            align-items: center;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        .secondary-info-row .value {
+            color: var(--accent);
+        }
+
+        /* Buttons */
+        .button-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        button {
+            font-family: inherit;
+            font-size: 0.8rem;
+            padding: 6px 12px;
+            border-radius: 999px;
+            border: 1px solid rgba(148, 163, 184, 0.7);
+            background: rgba(15, 23, 42, 0.9);
+            color: var(--text-main);
+            cursor: pointer;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            transition: background 120ms ease, border-color 120ms ease, transform 80ms ease, box-shadow 80ms ease;
+        }
+
+        button:hover {
+            background: var(--bg-panel-soft);
+            border-color: var(--accent);
+            box-shadow: 0 0 0 1px rgba(79, 209, 197, 0.3);
+        }
+
+        button:active {
+            transform: translateY(1px);
+            box-shadow: none;
+        }
+
+        #fetchbutton {
+            border-color: var(--danger);
+        }
+
+        #fetchbutton:hover {
+            border-color: var(--danger);
+            box-shadow: 0 0 0 1px rgba(248, 113, 113, 0.3);
+        }
+
+        /* Map */
+        #map {
+            height: 500px;
+        }
+
+
+        /* Footer and runway info */
+        .footer {
+            display: grid;
+            grid-template-columns: minmax(0, 2.2fr) minmax(0, 2fr);
+            gap: 16px;
+            margin-top: 4px;
+        }
+
+        @media (max-width: 800px) {
+            .footer {
+                grid-template-columns: minmax(0, 1fr);
+            }
+        }
+
+        .footer-card {
+            background: var(--bg-panel);
+            border-radius: 12px;
+            border: 1px solid var(--border-subtle);
+            padding: 12px 12px 10px;
+            font-size: 0.8rem;
+        }
+
+        .footer-card h2 {
+            margin: 0 0 6px;
+            font-size: 0.8rem;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        #rnwInfo {
+            color: var(--accent);
+        }
+
+        .meta {
+            margin-top: 8px;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .meta span {
+            white-space: nowrap;
+        }
+
+        /* METAR widget container */
+        .metar-wrapper {
+            background: var(--bg-panel);
+            border-radius: 12px;
+            border: 1px solid var(--border-subtle);
+            padding: 10px;
+            overflow: hidden;
+        }
+
+        /* Override inline color of the METAR anchor for dark mode */
+        #metartaf-cIFwuSJ1 {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-main) !important;
+            width: 100%;
+            height: 435px;
+            display: block;
+        }
+
+        /* Small scrollbars for info rows if needed */
+        .info-row::-webkit-scrollbar {
+            height: 4px;
+        }
+
+        .info-row::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .info-row::-webkit-scrollbar-thumb {
+            background: rgba(148, 163, 184, 0.6);
+            border-radius: 999px;
+        }
+    </style>
 </head>
 
 <body>
-    <div class="container">
-
-        <h1>Plane Shadow Calc <small>v1.1-clean</small></h1>
-        <h2>By Yaron Gefen, April 2023</h2>
-
-        <div class="info-bar">
-            <p>Info: <span id="date"></span> <span id="sunpos"></span></p>
-            <div class="slider-wrapper">
-                <label for="slider">Time of day</label>
-                <input type="range" id="slider" min="0" max="1440" value="720" step="1">
+    <div class="app">
+        <div class="top-row">
+            <div class="title-block">
+                <h1>Plane Shadow Map</h1>
+                <p class="subtitle">Ben Gurion real time shadow projection</p>
             </div>
-            <p>API Calls Left: <span id="apiCallsLeft"></span>. Last update: <samp id="updateTime"></samp>s ago</p>
-            <p>Active Runway: <span id="activeRnw"></span></p>
-            <div class="button-group">
-                <button id="nowbutton">Now</button>
-                <button id="fetchbutton">Update API</button>
-                <button id="posButton">GPS</button>
+
+            <!-- Info row that updates from JS -->
+            <div class="info-row">
+                <div>
+                    <span class="info-label">Date:</span>
+                    <span class="info-value" id="date"></span>
+                </div>
+                <div>
+                    <span class="info-label">Sun position:</span>
+                    <span class="info-value" id="sunpos"></span>
+                </div>
+                <input type="range" id="slider" name="slider" min="0" max="1440" value="720" step="1">
+
             </div>
         </div>
 
-        <div id="map"></div>
+        <main class="main">
+            <!-- Controls and slider above the map -->
+            <section class="control-panel">
+                <div class="slider-row">
 
-        <div class="card">
-            <button id="atisButton">ATIS</button>
-            <p>Runway Info: <span id="rnwInfo"></span></p>
-        </div>
+                </div>
 
-        <a href="#" class="metar-link" id="metartaf-cIFwuSJ1">
-            METAR Ben Gurion International Airport
-        </a>
-        <script async defer crossorigin="anonymous" src="https://metar-taf.com/embed-js/LLBG?target=cIFwuSJ1">
-        </script>
+                <div class="secondary-info-row">
+                    <span>API calls left: <span class="value" id="apiCallsLeft"></span></span>
+                    <span>Last update: <span class="value"><samp id="updateTime"></samp> seconds ago</span></span>
+                    <span>Active runway: <span class="value" id="activeRnw"></span></span>
+                </div>
 
-        <footer>
-            &copy; 2025 ShadowMap Inc.
-        </footer>
+                <div class="button-row">
+                    <!-- <button id="nowbutton" type="button">Now</button> -->
+                    <button id="fetchbutton" type="button">Update API</button>
+                    <button id="posButton" type="button">GPS</button>
+                    <!-- <button id="atisButton" type="button">ATIS</button> -->
+                </div>
+            </section>
+
+            <!-- Map takes most of the viewport -->
+            <div id="map"></div>
+        </main>
+
 
     </div>
 
-    <script type="module" src="./v1.1_clean.js"></script>
-</body>
+    <!-- Your main logic -->
+    <script type="module" src="./demo_25.js"></script>
+
+
+
+    <!-- Optional helper: show HH:MM in the slider label from slider value -->
+
+
+</html>

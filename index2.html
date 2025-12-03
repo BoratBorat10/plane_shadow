@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shadow Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
+        integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
+        integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/suncalc/1.9.0/suncalc.js"></script>
+    <script src="https://unpkg.com/@turf/turf@6/turf.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+    <div class="container">
+
+        <h1>Plane Shadow Calc <small>v1.1-clean</small></h1>
+        <h2>By Yaron Gefen, April 2023</h2>
+
+        <div class="info-bar">
+            <p>Info: <span id="date"></span> <span id="sunpos"></span></p>
+            <div class="slider-wrapper">
+                <label for="slider">Time of day</label>
+                <input type="range" id="slider" min="0" max="1440" value="720" step="1">
+            </div>
+            <p>API Calls Left: <span id="apiCallsLeft"></span>. Last update: <samp id="updateTime"></samp>s ago</p>
+            <p>Active Runway: <span id="activeRnw"></span></p>
+            <div class="button-group">
+                <button id="nowbutton">Now</button>
+                <button id="fetchbutton">Update API</button>
+                <button id="posButton">GPS</button>
+            </div>
+        </div>
+
+        <div id="map"></div>
+
+        <div class="card">
+            <button id="atisButton">ATIS</button>
+            <p>Runway Info: <span id="rnwInfo"></span></p>
+        </div>
+
+        <a href="#" class="metar-link" id="metartaf-cIFwuSJ1">
+            METAR Ben Gurion International Airport
+        </a>
+        <script async defer crossorigin="anonymous" src="https://metar-taf.com/embed-js/LLBG?target=cIFwuSJ1">
+        </script>
+
+        <footer>
+            &copy; 2025 ShadowMap Inc.
+        </footer>
+
+    </div>
+
+    <script type="module" src="./v1_tlv.js"></script>
+</body>

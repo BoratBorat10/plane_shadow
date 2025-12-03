@@ -8,29 +8,9 @@ import { frData } from './fr_data.js';
 import "https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js";
 
 
-
-const tlv = {}
-tlv.lat = 32.03993
-tlv.lon = 34.82497
-tlv.maintrack = track.track12
-
-const ams = {}
-ams.lat = 52.358301
-ams.lon = 4.863396
-ams.maintrack = track.ams22[0].features[0].geometry.coordinates
-
-
-
-const city = tlv
-
-console.log(city.lat)
-console.log("ams:", ams.maintrack)
-console.log("tlv:", tlv.maintrack[0].properties.lat)
-
-
 var map = L.map('map', {
     center: [32.03993, 34.82497],
-    zoom: 13
+    zoom: 11.5
 });
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -45,13 +25,9 @@ var slider = document.getElementById("slider");
 const ele = 670
 
 //create plane array
-// set this a variabel
-
 const plane_ar = []
-for (var i in city.maintrack) {
-    plane_ar.push({ 'lat': city.maintrack[i].properties.lat, 'lng': city.maintrack[i].properties.lon, 'ele': city.maintrack[i].properties.ele })
-    //plane_ar.push({ 'lat': track.ams22[0].features[0].geometry.coordinates[i][0], 'lng': track.track12[i].properties.lat, 'ele': track.track12[i].properties.ele })
-    console.log(plane_ar[i])
+for (var i in track.track12) {
+    plane_ar.push({ 'lat': track.track12[i].properties.lon, 'lng': track.track12[i].properties.lat, 'ele': track.track12[i].properties.ele })
 }
 
 //create layers
@@ -126,7 +102,7 @@ var shadow_ar = [] //create empty array for shadows;
 
 
 const date = new Date() //takes curent date
-const sunnow = SunCalc.getPosition(date, 52.358301, 4.863396) // set this a variabel
+const sunnow = SunCalc.getPosition(date, 32.068056, 34.769150)
 console.log(date)
 
 var sliderdate = new Date(date)
@@ -179,28 +155,16 @@ function shadowcalc(start_array, end_array, time) {
 }
 //same but with a single point
 function shadowcalcPoint(time, lat1, lon1, ele) {
-    // get sun position (azimuth & altitude in radians)
-    const sunpos = SunCalc.getPosition(time, lat1, lon1);
-    const alt = sunpos.altitude;
+    var sunpos = SunCalc.getPosition(time, lat1, lon1)
+    var sunazi = ((sunpos.azimuth * (180.0 / Math.PI))) //0 is south so 180 needs to be added to flip- took me hours to get this
+    var sunalt = (sunpos.altitude * 180.0 / Math.PI)
+    var shadowlen = (ele / Math.tan(sunpos.altitude))
+    var endpoint = new LatLon(lat1, lon1).destinationPoint(shadowlen, (sunazi))
 
-    // if sun is at or below horizon, no valid shadow
-    if (alt <= 0 || !Number.isFinite(ele)) {
-        // you can either return the original point,
-        // or [null, null] and handle it upstream
-        return [lat1, lon1];
-    }
+    var lat2 = endpoint._lat
+    var lon2 = endpoint._lon
+    return [lat2, lon2]
 
-    // convert azimuth to degrees and rotate 180° (SunCalc 0 is south)
-    const sunazi = sunpos.azimuth * 180 / Math.PI + 180;
-
-    // now tan(alt) is safe and >0
-    const shadowlen = ele / Math.tan(alt);
-
-    // compute the endpoint
-    const endpoint = new LatLon(lat1, lon1)
-        .destinationPoint(shadowlen, sunazi);
-
-    return [endpoint._lat, endpoint._lon];
 }
 
 //the now orange line
@@ -273,20 +237,20 @@ document.getElementById('slider').addEventListener('input', function () {
 
 
     document.getElementById('date').textContent = ((sliderdate.toString()).slice(3, 21))//cuts off of the GMT part at the end
-    document.getElementById('sunpos').textContent = `. Alt: ${Math.round(sunalt)}, Azi: ${Math.round(sunazi + 180)}`
+    document.getElementById('sunpos').textContent = `Alt: ${Math.round(sunalt)}, Azi: ${Math.round(sunazi + 180)}`
 
 });
 
 //now button resets date (doesnt work)
-document.getElementById('nowbutton').onclick = function (date) {
-    //date = Date()
-    console.log("now pressed", date)
-    document.getElementById('date').textContent = date
-    slider.setAttribute('value', slider.value + 10)
-    console.log(slider.max)
+// document.getElementById('nowbutton').onclick = function (date) {
+//     //date = Date()
+//     console.log("now pressed", date)
+//     document.getElementById('date').textContent = date
+//     slider.setAttribute('value', slider.value + 10)
+//     console.log(slider.max)
 
 
-}
+// }
 //runway decte takes a lat lon, and for the 3 buffer checks if within
 function rnwDetect(plane) {
 
@@ -439,20 +403,10 @@ var updateTime = null
 
 //every time fetch api button is pressed- this is to minimize api calls
 document.getElementById('fetchbutton').onclick = async function () {
-
+    console.log("cliked")
 
     //var dataSite = ('./objects/flights.json')
-    var dataSite = ('https://airlabs.co/api/v9/flights?api_key=02615d93-395d-4ad0-883e-b99d81c413ba&bbox=52.2683673926,4.5240882181,52.4857768841,5.1439002019')
-
-
-
-
-
-    https://airlabs.co/api/v9/flights?api_key=02615d93-395d-4ad0-883e-b99d81c413ba&bbox=52.2683673926,4.5240882181,52.4857768841,5.1439002019
-    //52.2683673926,4.5240882181,52.4857768841,5.1439002019,
-
-    //var dataSite = ('https://airlabs.co/api/v9/flights?api_key=02615d93-395d-4ad0-883e-b99d81c413ba&bbox=29.563,33.760,33.321,36.002')
-    //33.555403918,28.4916278507,36.4472538531,33.3204274327
+    var dataSite = ('https://airlabs.co/api/v9/flights?api_key=02615d93-395d-4ad0-883e-b99d81c413ba&bbox=29.563,33.760,33.321,36.002')
 
     //api_key=02615d93-395d-4ad0-883e-b99d81c413ba
 
@@ -512,11 +466,11 @@ document.getElementById('posButton').onclick = function () {
     const successCallback = (position) => {
         gpsLayer.clearLayers();
 
-        var gpslat = position.coords.latitude
-        var gpslon = position.coords.longitude
+        //var gpslat = position.coords.latitude
+        //var gpslon = position.coords.longitude
         //testing on rambam
-        //var gpslat = 32.0701889
-        //var gpslon = 34.7726968
+        var gpslat = 32.0701889
+        var gpslon = 34.7726968
 
         L.marker([gpslat, gpslon]).addTo(gpsLayer);
         L.circle([gpslat, gpslon], { radius: position.coords.accuracy }).addTo(gpsLayer);
@@ -546,18 +500,17 @@ document.getElementById('posButton').onclick = function () {
 }
 
 //ATIS audio button
-const atis = new Audio('./recordings/edds-atis-77073.mp3');
-document.getElementById('atisButton').onclick = function () {
+// const atis = new Audio('./recordings/edds-atis-77073.mp3');
+// document.getElementById('atisButton').onclick = function () {
 
-    if (atis.paused) { atis.play() }
-    else {
-        atis.pause();
-        atis.currentTime = 0// stars form the beging insead of just pauseing.
-    }
+//     if (atis.paused) { atis.play() }
+//     else {
+//         atis.pause();
+//         atis.currentTime = 0// stars form the beging insead of just pauseing.
+//     }
 
-    //atis.play()
-}
-document.getElementById('atisButton').addEventListener('click', console.log('audio click'))
+//     //atis.play()
+// }
 
 /*
 -----time test-----.
