@@ -13,8 +13,14 @@ var map = L.map('map', {
     zoom: 11.5
 });
 
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+//L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+// L.tileLayer('https://tiles.stadiamaps.com/tiles/stamen_toner_lite/{z}/{x}/{y}{r}.png', {
+//     maxZoom: 20,
+//     attribution: '&copy; <a href="https://stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://stamen.com/" target="_blank">Stamen Design</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>',
+// }).addTo(map);
+L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png', {
+    maxZoom: 20,
+    attribution: '&copy; <a href="https://stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>',
 }).addTo(map);
 
 //new slider
@@ -159,6 +165,10 @@ function shadowcalcPoint(time, lat1, lon1, ele) {
     var sunazi = ((sunpos.azimuth * (180.0 / Math.PI))) //0 is south so 180 needs to be added to flip- took me hours to get this
     var sunalt = (sunpos.altitude * 180.0 / Math.PI)
     var shadowlen = (ele / Math.tan(sunpos.altitude))
+    if (!Number.isFinite(shadowlen)) {
+        console.log('Bad shadowlen', { ele, sunpos, lat1, lon1, time });
+        return
+    }
     var endpoint = new LatLon(lat1, lon1).destinationPoint(shadowlen, (sunazi))
 
     var lat2 = endpoint._lat
@@ -205,7 +215,7 @@ document.getElementById('slider').addEventListener('input', function () {
     //shadow_marker.setLatLng([endpoint._lat, endpoint._lon])
     active_polyline.clearLayers();
     shadowcalc(plane_ar, new_ar, sliderdate)
-    var shadowline = L.polyline(new_ar, { color: 'black' })
+    var shadowline = L.polyline(new_ar, { color: '#b65cf1' })
 
     if (sunalt > 0) {
         shadowline.addTo(active_polyline)
@@ -345,6 +355,9 @@ function timeDiff(airlab) {
 function planeDraw(airlab) {
 
     airlab.response.forEach((plane, i) => {
+        if (plane.alt == null || plane.alt < 1 || plane.speed == null || plane.speed <= 0) {
+            return;
+        }
         var lat = plane.lat
         var lon = plane.lng
         var t = 0
@@ -370,26 +383,36 @@ function planeDraw(airlab) {
         var shadowLocationAr = []
 
         setInterval(function () {
-            t++
+            t++;
 
-            //setTimeout(() => {liveplane.clearLayers()}, 910);
+            // setTimeout(() => {liveplane.clearLayers()}, 910);
 
-            var speed = (plane.speed / (3.6 * 2)) //to get meter per second
-            var start = new LatLon(lat, lon).destinationPoint(speed * t, plane.dir)
-            planeMarker.setLatLng([start._lat, start._lon])
+            const speed = plane.speed / (3.6 * 2); // to get meter per second
+            const start = new LatLon(lat, lon).destinationPoint(speed * t, plane.dir);
+            planeMarker.setLatLng([start._lat, start._lon]);
 
-
-            var shaodowpoint = (shadowcalcPoint(Date.now(), start._lat, start._lon, airlab.response[i].alt))
-            shadowMarker.setLatLng([shaodowpoint[0], shaodowpoint[1]])
-            //shadowLocationAr.push([plane.hex,shaodowpoint[0],shaodowpoint[1]])
-            //popup.setContent( lat)
+            // Use the local plane object, not airlab.response[i]
+            const planeAlt = Number(plane.alt);
 
 
+            // Only compute a shadow if altitude is valid
+            if (Number.isFinite(planeAlt) && planeAlt > 0) {
+                const shadowPoint = shadowcalcPoint(new Date(), start._lat, start._lon, planeAlt);
+                shadowMarker.setLatLng([shadowPoint[0], shadowPoint[1]]);
+            }
         }, 500);
 
+        // Decide if markers should be added based on the same planeAlt
+        const initialAlt = Number(plane.alt);
 
-        if (airlab.response[i].alt > 1) { planeMarker.addTo(liveplane) }; //if plane off the gound
-        if (sunnow.altitude > 0 && airlab.response[i].alt) { shadowMarker.addTo(liveplane) }; // if the sun is up
+        if (Number.isFinite(initialAlt) && initialAlt > 1) {
+            planeMarker.addTo(liveplane); // plane off the ground
+        }
+
+        if (sunnow.altitude > 0 && Number.isFinite(initialAlt) && initialAlt > 0) {
+            shadowMarker.addTo(liveplane); // sun up and plane has altitude
+        }
+        ; // if the sun is up
 
     })
 
@@ -416,7 +439,6 @@ document.getElementById('fetchbutton').onclick = async function () {
         .then((response) => response.json())
         .then((air_source) => {
 
-            console.log(air_source)
             sessionStorage.setItem('air_source', JSON.stringify(air_source))
             console.log(updateTime)
 
